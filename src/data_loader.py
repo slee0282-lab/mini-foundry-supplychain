@@ -20,13 +20,24 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
+def get_env_or_secret(key: str, default: str = None) -> str:
+    """Get value from Streamlit secrets or environment variable."""
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and key in st.secrets:
+            return st.secrets[key]
+    except:
+        pass
+    return os.getenv(key, default)
+
+
 class Neo4jConnection:
     """Manages Neo4j database connections and operations."""
 
     def __init__(self, uri: str = None, user: str = None, password: str = None):
-        self.uri = uri or os.getenv('NEO4J_URI', 'bolt://localhost:7687')
-        self.user = user or os.getenv('NEO4J_USER', 'neo4j')
-        self.password = password or os.getenv('NEO4J_PASSWORD', 'password')
+        self.uri = uri or get_env_or_secret('NEO4J_URI', 'bolt://localhost:7687')
+        self.user = user or get_env_or_secret('NEO4J_USER', 'neo4j')
+        self.password = password or get_env_or_secret('NEO4J_PASSWORD', 'password')
 
         self.driver = None
         self.graph = None
@@ -113,7 +124,7 @@ class DataLoader:
 
     def __init__(self, neo4j_connection: Neo4jConnection = None):
         self.neo4j = neo4j_connection or Neo4jConnection()
-        self.data_path = os.getenv('DATA_PATH', './data')
+        self.data_path = get_env_or_secret('DATA_PATH', './data')
         self.csv_files = {
             'suppliers': 'suppliers.csv',
             'products': 'products.csv',
