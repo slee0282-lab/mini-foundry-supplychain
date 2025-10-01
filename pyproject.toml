@@ -13,6 +13,10 @@ dependencies = [
     "py2neo>=2021.2.4",
     "seaborn>=0.13.2",
     "streamlit>=1.50.0",
+    "python-dotenv>=1.0.0",
+    "scikit-learn>=1.3.0",
+    "neo4j>=5.0.0",
+    "python-dateutil>=2.8.0",
 ]
 
 [dependency-groups]

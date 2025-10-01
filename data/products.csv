@@ -1,0 +1,6 @@
+product_id,product_name,category,safety_stock,demand_forecast
+P1,Vaccine A,Pharma,500,1200
+P2,Diagnostic Kit X,Medical Devices,300,900
+P3,Reagent Mix R,Pharma,250,600
+P4,NutriSupplement B,Nutrition,400,750
+P5,Therapeutic Gel G,Consumables,200,550

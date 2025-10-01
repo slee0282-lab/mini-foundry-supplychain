@@ -1,0 +1,6 @@
+customer_id,name,region,avg_demand_units
+C1,Hospital SG,APAC,300
+C2,Clinic USA,North America,250
+C3,Research Lab EU,Europe,180
+C4,Wellness Chain BR,Latin America,220
+C5,Health Ministry ZA,Africa,200

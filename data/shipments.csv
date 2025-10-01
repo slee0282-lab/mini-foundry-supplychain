@@ -1,0 +1,9 @@
+shipment_id,supplier_id,product_id,warehouse_id,qty_units,planned_lead_time_days,status
+SH1,S1,P1,W1,400,7,On-Time
+SH2,S2,P2,W2,350,9,In-Transit
+SH3,S3,P3,W3,220,6,On-Time
+SH4,S4,P4,W4,380,12,Delayed
+SH5,S5,P5,W5,260,10,On-Time
+SH6,S1,P2,W1,300,8,In-Transit
+SH7,S3,P1,W3,450,7,On-Time
+SH8,S2,P4,W2,290,9,Delayed

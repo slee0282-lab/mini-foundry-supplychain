@@ -1,0 +1,6 @@
+warehouse_id,location,capacity_units,region
+W1,Singapore,10000,APAC
+W2,Chicago,8000,North America
+W3,Frankfurt,9000,Europe
+W4,Sao Paulo,7000,Latin America
+W5,Johannesburg,6500,Africa
