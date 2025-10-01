@@ -39,6 +39,9 @@ class Neo4jConnection:
         self.user = user or get_env_or_secret('NEO4J_USER', 'neo4j')
         self.password = password or get_env_or_secret('NEO4J_PASSWORD', 'password')
 
+        # Debug logging
+        logger.info(f"Neo4j connection config: URI={self.uri}, USER={self.user}")
+
         self.driver = None
         self.graph = None
         self._connect()
