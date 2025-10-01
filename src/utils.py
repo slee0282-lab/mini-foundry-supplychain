@@ -16,14 +16,25 @@ import json
 load_dotenv()
 
 
+def get_env_or_secret(key: str, default: str = None) -> str:
+    """Get value from Streamlit secrets or environment variable."""
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and key in st.secrets:
+            return st.secrets[key]
+    except:
+        pass
+    return os.getenv(key, default)
+
+
 def load_config() -> Dict[str, Any]:
     """Load configuration from environment variables."""
     config = {
         # Neo4j Configuration
         'neo4j': {
-            'uri': os.getenv('NEO4J_URI', 'bolt://localhost:7687'),
-            'user': os.getenv('NEO4J_USER', 'neo4j'),
-            'password': os.getenv('NEO4J_PASSWORD', 'password')
+            'uri': get_env_or_secret('NEO4J_URI', 'bolt://localhost:7687'),
+            'user': get_env_or_secret('NEO4J_USER', 'neo4j'),
+            'password': get_env_or_secret('NEO4J_PASSWORD', 'password')
         },
 
         # Application Configuration
