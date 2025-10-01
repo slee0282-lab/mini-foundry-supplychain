@@ -41,8 +41,16 @@ class Neo4jConnection:
                 auth=(self.user, self.password)
             )
 
-            # Connect with py2neo for easier operations
-            self.graph = Graph(self.uri, auth=(self.user, self.password))
+            # Connect with py2neo for easier operations (only for local/non-Aura)
+            if not self.uri.startswith('neo4j+s://'):
+                try:
+                    self.graph = Graph(self.uri, auth=(self.user, self.password))
+                except:
+                    self.graph = None
+                    logger.warning("py2neo connection failed, using driver only")
+            else:
+                self.graph = None
+                logger.info("Using Neo4j driver only (Aura mode)")
 
             # Test connection
             self.driver.verify_connectivity()
