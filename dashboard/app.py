@@ -447,6 +447,13 @@ def show_simulation_page(simulator):
         help="Number of days to delay the supplier"
     )
 
+    # Expedite toggle
+    expedite_recovery = st.sidebar.checkbox(
+        "Apply Expedite Recovery",
+        value=False,
+        help="Apply expedite shipments for late orders to recover SLA (incurs additional cost)."
+    )
+
     # Simulation naming
     scenario_name = st.sidebar.text_input(
         "Scenario Name (optional):",
@@ -460,7 +467,8 @@ def show_simulation_page(simulator):
                 scenario = simulator.simulate_supplier_delay(
                     selected_supplier,
                     delay_days,
-                    scenario_name or None
+                    scenario_name or None,
+                    expedite=expedite_recovery
                 )
 
                 st.session_state['last_simulation'] = scenario
@@ -485,123 +493,140 @@ def show_simulation_page(simulator):
         # Key results summary
         st.subheader("📊 Simulation Results")
 
+        kpis = results['kpis']
+        baseline_late = simulator.baseline_metrics.get('late_orders', 0)
+        expedite_enabled = results['simulation_parameters']['expedite_enabled']
+
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
             st.metric(
-                "Overall SLA Impact",
-                f"{results['overall_sla_impact']:.1f}%",
-                delta=f"-{results['overall_sla_impact']:.1f}%"
+                "SLA (Post-Scenario)",
+                f"{kpis['new_sla']:.1f}%",
+                delta=f"{kpis['delta_sla']:.1f} pp"
             )
 
         with col2:
             st.metric(
-                "Affected Paths",
-                results['path_count'],
+                "Baseline SLA",
+                f"{kpis['baseline_sla']:.1f}%",
                 delta=None
             )
 
         with col3:
             st.metric(
-                "Quantity at Risk",
-                f"{results['quantity_exceeding_sla']:,}",
-                delta=None
+                "Late Orders",
+                int(kpis['late_orders_after_delay']),
+                delta=f"{int(kpis['late_orders_after_delay']) - baseline_late:+d}"
             )
 
         with col4:
-            business_impact = results['business_impact']['financial']['total_financial_impact']
-            st.metric(
-                "Financial Impact",
-                f"${business_impact:,.0f}",
-                delta=f"-${business_impact:,.0f}"
-            )
+            if expedite_enabled:
+                st.metric(
+                    "Expedite Cost",
+                    f"${kpis['expedite_cost_total']:,.0f}",
+                    delta=None
+                )
+            else:
+                st.metric(
+                    "Late Orders (No Recovery)",
+                    int(kpis['late_orders_without_recovery']),
+                    delta=f"{int(kpis['late_orders_without_recovery']) - baseline_late:+d}"
+                )
+
+        if expedite_enabled:
+            st.info("Expedite recovery applied: late shipments are recovered at additional cost.")
+        elif kpis['late_orders_without_recovery'] > 0:
+            st.warning("Late orders calculated without expedite recovery. Toggle expedite to estimate recovery cost.")
 
         # Regional impact analysis
         st.subheader("🌍 Regional Impact Analysis")
 
-        regional_impacts = results['regional_impacts']
-        if regional_impacts:
-            regional_df = pd.DataFrame([
-                {
-                    'Region': region,
-                    'SLA Impact (%)': data['sla_impact_percent'],
-                    'Total Volume': data['total_volume'],
-                    'Delayed Volume': data['delayed_volume'],
-                    'Warehouses': len(data['warehouses']),
-                    'Products Affected': data['products_affected']
-                }
-                for region, data in regional_impacts.items()
-            ]).sort_values('SLA Impact (%)', ascending=False)
+        regional_df = pd.DataFrame(results['regional_impacts'])
+        if not regional_df.empty:
+            regional_df = regional_df.sort_values('delta_sla')
 
             col_left, col_right = st.columns(2)
 
             with col_left:
-                # Regional impact bar chart
                 fig_regional = px.bar(
                     regional_df,
-                    x='Region',
-                    y='SLA Impact (%)',
-                    title="SLA Impact by Region",
-                    color='SLA Impact (%)',
-                    color_continuous_scale=['green', 'yellow', 'red']
+                    x='region',
+                    y='delta_sla',
+                    title="Δ SLA vs Baseline by Region",
+                    color='delta_sla',
+                    color_continuous_scale=['red', 'orange', 'green']
                 )
+                fig_regional.update_layout(yaxis_title='Δ SLA (pp)')
                 st.plotly_chart(fig_regional, use_container_width=True)
 
             with col_right:
-                # Regional details table
-                st.dataframe(regional_df, use_container_width=True)
+                display_df = regional_df.rename(columns={
+                    'region': 'Region',
+                    'baseline_sla': 'Baseline SLA (%)',
+                    'new_sla': 'New SLA (%)',
+                    'delta_sla': 'Δ SLA (pp)',
+                    'late_orders': 'Late Orders',
+                    'late_orders_without_recovery': 'Late (No Recovery)',
+                    'expedite_cost': 'Expedite Cost ($)',
+                    'shipments': '# Shipments'
+                })
+                st.dataframe(
+                    display_df.style.format({
+                        'Baseline SLA (%)': '{:.1f}',
+                        'New SLA (%)': '{:.1f}',
+                        'Δ SLA (pp)': '{:.1f}',
+                        'Expedite Cost ($)': '${:,.0f}'
+                    }),
+                    use_container_width=True
+                )
+        else:
+            st.info("No regional data available for this scenario.")
 
-        # Affected supply paths
-        st.subheader("🛣️ Affected Supply Paths")
+        # Impacted shipments list
+        st.subheader("🛒 Impacted Shipments")
 
-        affected_paths = results['affected_paths']
-        if affected_paths:
-            paths_df = pd.DataFrame(affected_paths)
+        impacted_shipments = results['impacted_shipments']
+        if impacted_shipments:
+            impacted_df = pd.DataFrame(impacted_shipments)
+            display_impacted = impacted_df.rename(columns={
+                'shipment_id': 'Shipment',
+                'supplier_id': 'Supplier',
+                'product_id': 'Product',
+                'product_name': 'Product Name',
+                'warehouse_id': 'Warehouse',
+                'warehouse_region': 'Region',
+                'quantity': 'Quantity',
+                'current_lead_time': 'Baseline Lead (days)',
+                'delayed_lead_time': 'Delayed Lead (days)',
+                'promised_days': 'Promised SLA (days)',
+                'expedited': 'Expedited',
+                'expedite_cost': 'Expedite Cost ($)'
+            })
 
-            # Filter to show only SLA-exceeding paths
-            sla_exceeded = paths_df[paths_df['exceeds_sla']]
+            st.dataframe(
+                display_impacted.style.format({
+                    'Baseline Lead (days)': '{:.1f}',
+                    'Delayed Lead (days)': '{:.1f}',
+                    'Promised SLA (days)': '{:.0f}',
+                    'Expedite Cost ($)': '${:,.0f}'
+                }),
+                use_container_width=True
+            )
 
-            if len(sla_exceeded) > 0:
-                st.write(f"**{len(sla_exceeded)} paths exceed SLA threshold:**")
-
-                display_df = sla_exceeded[[
-                    'supplier_name', 'product_name', 'warehouse_location',
-                    'warehouse_region', 'original_lead_time', 'new_lead_time',
-                    'quantity_affected'
-                ]].copy()
-
-                display_df.columns = [
-                    'Supplier', 'Product', 'Warehouse', 'Region',
-                    'Original Lead Time', 'New Lead Time', 'Quantity'
-                ]
-
-                st.dataframe(display_df, use_container_width=True)
-            else:
-                st.info("No supply paths exceed the SLA threshold.")
+            csv_data = display_impacted.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                "⬇️ Download Impacted Shipments",
+                data=csv_data,
+                file_name=f"impacted_shipments_{selected_supplier}_{delay_days}d.csv",
+                mime="text/csv"
+            )
+        else:
+            st.success("No shipments breach SLA under the current scenario.")
 
         # Simulation summary
         st.subheader("📋 Executive Summary")
-
-        summary_text = results['summary']
-        st.markdown(summary_text)
-
-        # Business impact details
-        with st.expander("💼 Detailed Business Impact"):
-            business_impact = results['business_impact']
-
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.write("**Financial Impact:**")
-                st.write(f"• Revenue at Risk: ${business_impact['financial']['potential_revenue_at_risk']:,.0f}")
-                st.write(f"• SLA Penalties: ${business_impact['financial']['estimated_sla_penalties']:,.0f}")
-                st.write(f"• Total Financial Impact: ${business_impact['financial']['total_financial_impact']:,.0f}")
-
-            with col2:
-                st.write("**Operational Impact:**")
-                st.write(f"• Orders Delayed: {business_impact['operational']['orders_delayed']}")
-                st.write(f"• Delay Rate: {business_impact['operational']['delay_rate_percent']:.1f}%")
-                st.write(f"• Volume at Risk: {business_impact['operational']['volume_at_risk']:,} units")
+        st.markdown(results['summary'])
 
     else:
         # Show simulation guidance
@@ -808,12 +833,16 @@ def show_network_explorer_page(simulator, analytics):
                     continue
                 x0, y0 = positions[edge[0]]
                 x1, y1 = positions[edge[1]]
+                edge_data = simulator.current_graph.get_edge_data(edge[0], edge[1]) or {}
+                edge_impacted = edge_data.get('impacted', False)
+                edge_color = '#DC143C' if edge_impacted else 'lightgray'
+                edge_width = 2.5 if edge_impacted else 0.5
 
                 fig_network.add_trace(go.Scatter(
                     x=[x0, x1, None],
                     y=[y0, y1, None],
                     mode='lines',
-                    line=dict(width=0.5, color='lightgray'),
+                    line=dict(width=edge_width, color=edge_color),
                     hoverinfo='none',
                     showlegend=False
                 ))
@@ -842,14 +871,26 @@ def show_network_explorer_page(simulator, analytics):
                 if nodes_with_positions:
                     x_coords = [positions[node][0] for node in nodes_with_positions]
                     y_coords = [positions[node][1] for node in nodes_with_positions]
+                    impacted_flags = [simulator.current_graph.nodes[node].get('impacted', False)
+                                      for node in nodes_with_positions]
+                    node_colors = ['#DC143C' if flag else color for flag in impacted_flags]
+                    node_sizes = [12 if flag else 10 for flag in impacted_flags]
+                    node_labels = []
+                    for node in nodes_with_positions:
+                        node_data = simulator.current_graph.nodes[node]
+                        label = node_data.get('name', node)
+                        if node_data.get('impacted'):
+                            reason = node_data.get('impact_reason', 'Impact')
+                            label = f"{label} ⚠️ ({reason})"
+                        node_labels.append(label)
 
                     fig_network.add_trace(go.Scatter(
                         x=x_coords,
                         y=y_coords,
                         mode='markers',
-                        marker=dict(size=10, color=color),
+                        marker=dict(size=node_sizes, color=node_colors, line=dict(color='black', width=1)),
                         name=node_type.title(),
-                        text=[simulator.current_graph.nodes[node].get('name', node) for node in nodes_with_positions],
+                        text=node_labels,
                         hovertemplate='%{text}<extra></extra>'
                     ))
 
@@ -865,13 +906,25 @@ def show_network_explorer_page(simulator, analytics):
                 x_coords = [positions[node][0] for node in other_nodes_with_positions]
                 y_coords = [positions[node][1] for node in other_nodes_with_positions]
                 if x_coords:
+                    other_impacted = [simulator.current_graph.nodes[node].get('impacted', False)
+                                      for node in other_nodes_with_positions]
+                    other_colors = ['#DC143C' if flag else '#808080' for flag in other_impacted]
+                    other_sizes = [12 if flag else 10 for flag in other_impacted]
+                    other_labels = []
+                    for node in other_nodes_with_positions:
+                        node_data = simulator.current_graph.nodes[node]
+                        label = node_data.get('name', node)
+                        if node_data.get('impacted'):
+                            reason = node_data.get('impact_reason', 'Impact')
+                            label = f"{label} ⚠️ ({reason})"
+                        other_labels.append(label)
                     fig_network.add_trace(go.Scatter(
                         x=x_coords,
                         y=y_coords,
                         mode='markers',
-                        marker=dict(size=10, color='#808080'),
+                        marker=dict(size=other_sizes, color=other_colors, line=dict(color='black', width=1)),
                         name='Other',
-                        text=[simulator.current_graph.nodes[node].get('name', node) for node in other_nodes_with_positions],
+                        text=other_labels,
                         hovertemplate='%{text}<extra></extra>'
                     ))
 
