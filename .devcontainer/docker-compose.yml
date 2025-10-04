@@ -20,9 +20,6 @@ services:
     # Keep container running
     command: sleep infinity
 
-    # Network mode for better performance with Colima
-    network_mode: bridge
-
     # Environment variables
     environment:
       - NEO4J_URI=neo4j://neo4j:7687
