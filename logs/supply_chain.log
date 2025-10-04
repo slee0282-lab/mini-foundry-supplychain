@@ -673,3 +673,238 @@ Verifying data load...
 2025-10-04 19:43:01,075 - utils - INFO - ✓ PILOT DATA LOAD COMPLETE
 2025-10-04 19:43:01,075 - utils - INFO - ============================================================
 2025-10-04 19:43:01,075 - data_loader - INFO - Neo4j connection closed
+2025-10-04 21:20:01,730 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 21:20:01,730 - utils - INFO - 🚀 Starting Neo4j Setup and Data Loading
+2025-10-04 21:20:01,730 - utils - INFO - Initializing data loader...
+2025-10-04 21:20:01,730 - data_loader - INFO - Neo4j connection config: URI=bolt://localhost:7687, USER=neo4j
+2025-10-04 21:20:01,780 - data_loader - INFO - Successfully connected to Neo4j at bolt://localhost:7687
+2025-10-04 21:20:01,781 - utils - INFO - Testing Neo4j connection...
+2025-10-04 21:20:01,781 - root - INFO - Starting: Neo4j connection test
+2025-10-04 21:20:01,824 - root - INFO - Completed: Neo4j connection test in 0.04 seconds
+2025-10-04 21:20:01,824 - utils - INFO - ✅ Neo4j connection successful
+2025-10-04 21:20:01,824 - utils - INFO - Validating CSV files...
+2025-10-04 21:20:01,824 - data_loader - INFO - ✓ Found suppliers.csv
+2025-10-04 21:20:01,824 - data_loader - INFO - ✓ Found products.csv
+2025-10-04 21:20:01,824 - data_loader - INFO - ✓ Found warehouses.csv
+2025-10-04 21:20:01,824 - data_loader - INFO - ✓ Found customers.csv
+2025-10-04 21:20:01,824 - data_loader - INFO - ✓ Found shipments.csv
+2025-10-04 21:20:01,824 - utils - INFO - ✅ All CSV files found
+2025-10-04 21:20:01,824 - utils - INFO - Loading CSV data...
+2025-10-04 21:20:01,824 - root - INFO - Starting: CSV data loading
+2025-10-04 21:20:01,825 - data_loader - INFO - Loaded suppliers.csv: 5 records
+2025-10-04 21:20:01,826 - data_loader - INFO - Loaded products.csv: 5 records
+2025-10-04 21:20:01,826 - data_loader - INFO - Loaded warehouses.csv: 5 records
+2025-10-04 21:20:01,827 - data_loader - INFO - Loaded customers.csv: 5 records
+2025-10-04 21:20:01,827 - data_loader - INFO - Loaded shipments.csv: 8 records
+2025-10-04 21:20:01,827 - root - INFO - Completed: CSV data loading in 0.00 seconds
+2025-10-04 21:20:01,827 - utils - INFO - Validating data integrity...
+2025-10-04 21:20:01,827 - utils - INFO - ✅ Data integrity validation passed
+2025-10-04 21:20:01,827 - utils - INFO - Setting up database schema...
+2025-10-04 21:20:01,827 - root - INFO - Starting: Database schema setup
+2025-10-04 21:20:01,974 - data_loader - INFO - Successfully executed queries from neo4j/constraints.cypher
+2025-10-04 21:20:01,975 - root - INFO - Completed: Database schema setup in 0.15 seconds
+2025-10-04 21:20:01,975 - utils - INFO - ✅ Database schema setup completed
+2025-10-04 21:20:01,975 - utils - INFO - Loading data to Neo4j...
+2025-10-04 21:20:01,975 - root - INFO - Starting: Data loading to Neo4j
+2025-10-04 21:20:01,975 - data_loader - INFO - CSV files prepared for import
+2025-10-04 21:20:02,022 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: STOCKED_AT)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:STOCKED_AT]-() RETURN count(r) as stocked_at_relationships'
+2025-10-04 21:20:02,034 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: DELIVERS_TO)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:DELIVERS_TO]-() RETURN count(r) as delivers_to_relationships'
+2025-10-04 21:20:02,044 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: CREATES)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:CREATES]-() RETURN count(r) as creates_relationships'
+2025-10-04 21:20:02,057 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: CONTAINS)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:CONTAINS]-() RETURN count(r) as contains_relationships'
+2025-10-04 21:20:02,067 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: DELIVERED_TO)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:DELIVERED_TO]-() RETURN count(r) as delivered_to_relationships'
+2025-10-04 21:20:02,067 - data_loader - INFO - Successfully executed queries from neo4j/load_data.cypher
+2025-10-04 21:20:02,067 - data_loader - INFO - Data loaded successfully into Neo4j
+2025-10-04 21:20:02,067 - data_loader - INFO - === Database Statistics ===
+2025-10-04 21:20:02,076 - data_loader - INFO - Suppliers: 0
+2025-10-04 21:20:02,083 - data_loader - INFO - Products: 0
+2025-10-04 21:20:02,091 - data_loader - INFO - Warehouses: 0
+2025-10-04 21:20:02,100 - data_loader - INFO - Customers: 0
+2025-10-04 21:20:02,107 - data_loader - INFO - Shipments: 0
+2025-10-04 21:20:02,107 - root - INFO - Completed: Data loading to Neo4j in 0.13 seconds
+2025-10-04 21:20:02,107 - utils - INFO - ✅ Data loading completed successfully
+2025-10-04 21:20:02,127 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: SUPPLIES)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:SUPPLIES]-() RETURN count(r) as count'
+2025-10-04 21:20:02,136 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: STOCKED_AT)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:STOCKED_AT]-() RETURN count(r) as count'
+2025-10-04 21:20:02,136 - utils - INFO - 📊 Final Database Statistics:
+2025-10-04 21:20:02,137 - utils - INFO -   suppliers: 0
+2025-10-04 21:20:02,137 - utils - INFO -   products: 0
+2025-10-04 21:20:02,137 - utils - INFO -   warehouses: 0
+2025-10-04 21:20:02,137 - utils - INFO -   customers: 0
+2025-10-04 21:20:02,137 - utils - INFO -   shipments: 0
+2025-10-04 21:20:02,137 - utils - INFO -   supplies_relationships: 0
+2025-10-04 21:20:02,137 - utils - INFO -   stocked_relationships: 0
+2025-10-04 21:20:02,137 - utils - INFO - 🎉 Neo4j setup and data loading completed successfully!
+2025-10-04 21:20:02,137 - utils - INFO - 
+Next steps:
+2025-10-04 21:20:02,137 - utils - INFO - 1. Run the dashboard: python main.py
+2025-10-04 21:20:02,137 - utils - INFO - 2. Or directly: streamlit run dashboard/app.py
+2025-10-04 21:20:02,137 - utils - INFO - 3. Open your browser to: http://localhost:8501
+2025-10-04 21:20:02,137 - data_loader - INFO - Neo4j connection closed
+2025-10-04 21:22:21,983 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 21:22:21,983 - utils - INFO - 🚀 Starting Direct Data Load to Neo4j
+2025-10-04 21:22:21,984 - data_loader - INFO - Neo4j connection config: URI=bolt://localhost:7687, USER=neo4j
+2025-10-04 21:22:22,035 - data_loader - INFO - Successfully connected to Neo4j at bolt://localhost:7687
+2025-10-04 21:22:22,035 - utils - INFO - ✅ Connected to Neo4j
+2025-10-04 21:22:22,035 - utils - INFO - Clearing existing data...
+2025-10-04 21:22:22,103 - utils - INFO - ✅ Database cleared
+2025-10-04 21:22:22,104 - utils - INFO - Loading 5 suppliers...
+2025-10-04 21:22:22,193 - utils - INFO - ✅ Loaded 5 suppliers
+2025-10-04 21:22:22,194 - utils - INFO - Loading 5 products...
+2025-10-04 21:22:22,259 - utils - INFO - ✅ Loaded 5 products
+2025-10-04 21:22:22,261 - utils - INFO - Loading 5 warehouses...
+2025-10-04 21:22:22,314 - utils - INFO - ✅ Loaded 5 warehouses
+2025-10-04 21:22:22,315 - utils - INFO - Loading 5 customers...
+2025-10-04 21:22:22,367 - utils - INFO - ✅ Loaded 5 customers
+2025-10-04 21:22:22,370 - utils - INFO - Loading 8 shipments and relationships...
+2025-10-04 21:22:22,493 - utils - INFO - ✅ Loaded 8 shipments and relationships
+2025-10-04 21:22:22,493 - utils - INFO - Creating warehouse-customer relationships...
+2025-10-04 21:22:22,531 - neo4j.notifications - INFO - Received notification from DBMS server: <GqlStatusObject gql_status='03N42', status_description='If a part of a query contains multiple disconnected patterns, this will build a cartesian product between all those parts. This may produce a large amount of data and slow down query processing. While occasionally intended, it may often be possible to reformulate the query that avoids the use of this cross product, perhaps by adding a relationship between the different parts or by using OPTIONAL MATCH (identifier is: (c))', position=<SummaryInputPosition line=2, column=1, offset=5>, raw_classification='PERFORMANCE', classification=<NotificationClassification.PERFORMANCE: 'PERFORMANCE'>, raw_severity='INFORMATION', severity=<NotificationSeverity.INFORMATION: 'INFORMATION'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'PERFORMANCE', '_severity': 'INFORMATION', '_position': {'column': 1, 'offset': 5, 'line': 2}}> for query: '\n    MATCH (w:Warehouse), (c:Customer)\n    WHERE w.region = c.region\n    MERGE (w)-[:DELIVERS_TO {\n        avg_delivery_days: 2,\n        shipping_cost: 25.0,\n        service_level: 0.95\n    }]->(c)\n    '
+2025-10-04 21:22:22,531 - utils - INFO - ✅ Created warehouse-customer relationships
+2025-10-04 21:22:22,533 - utils - INFO - Loading 40 SLA rules...
+2025-10-04 21:22:22,653 - utils - INFO - ✅ Loaded 40 SLA rules
+2025-10-04 21:22:22,656 - utils - INFO - Loading 50 lots...
+2025-10-04 21:22:22,847 - utils - INFO - ✅ Loaded 50 lots
+2025-10-04 21:22:22,850 - utils - INFO - Loading 44 events...
+2025-10-04 21:22:23,036 - utils - INFO - ✅ Loaded 44 events
+2025-10-04 21:22:23,038 - utils - INFO - Loading 62 cost records...
+2025-10-04 21:22:23,188 - utils - INFO - ✅ Loaded 62 cost records
+2025-10-04 21:22:23,190 - utils - INFO - Loading 64 cold chain readings...
+2025-10-04 21:22:23,241 - data_loader - ERROR - Error executing Cypher query: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Text cannot be parsed to a DateTime
+"2024-01-12 08:00:00"
+ ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Text cannot be parsed to a DateTime
+"2024-01-12 08:00:00"
+ ^}
+2025-10-04 21:22:23,242 - data_loader - ERROR - Query: 
+            MERGE (r:ColdChainReading {reading_id: $reading_id})
+            SET r.shipment_id = $shipment_id,
+                r.lot_id = $lot_id,
+                r.timestamp = datetime($timestamp),
+                r.temperature_c = $temperature_c,
+                r.threshold_min_c = $threshold_min_c,
+                r.threshold_max_c = $threshold_max_c,
+                r.excursion_flag = $excursion_flag,
+                r.excursion_duration_minutes = $excursion_duration_minutes,
+                r.notes = $notes,
+                r.updated_at = datetime()
+            
+2025-10-04 21:22:23,242 - utils - ERROR - ❌ Data loading failed: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Text cannot be parsed to a DateTime
+"2024-01-12 08:00:00"
+ ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Text cannot be parsed to a DateTime
+"2024-01-12 08:00:00"
+ ^}
+2025-10-04 21:22:23,248 - utils - ERROR - Traceback (most recent call last):
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/scripts/direct_load_data.py", line 444, in main
+    load_pilot_supporting_data(neo4j, data_path)
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/scripts/direct_load_data.py", line 348, in load_pilot_supporting_data
+    neo4j.execute_cypher(query, params)
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/src/data_loader.py", line 87, in execute_cypher
+    result = session.run(query, parameters or {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/work/session.py", line 320, in run
+    self._auto_result._run(
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/work/result.py", line 237, in _run
+    self._attach()
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/work/result.py", line 439, in _attach
+    self._connection.fetch_message()
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_common.py", line 192, in inner
+    func(*args, **kwargs)
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_bolt.py", line 866, in fetch_message
+    res = self._process_message(tag, fields)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_bolt5.py", line 496, in _process_message
+    response.on_failure(summary_metadata or {})
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_common.py", line 262, in on_failure
+    raise self._hydrate_error(metadata)
+neo4j.exceptions.CypherSyntaxError: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Text cannot be parsed to a DateTime
+"2024-01-12 08:00:00"
+ ^} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Text cannot be parsed to a DateTime
+"2024-01-12 08:00:00"
+ ^}
+
+2025-10-04 21:23:13,944 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 21:23:13,944 - utils - INFO - 🚀 Starting Direct Data Load to Neo4j
+2025-10-04 21:23:13,944 - data_loader - INFO - Neo4j connection config: URI=bolt://localhost:7687, USER=neo4j
+2025-10-04 21:23:13,998 - data_loader - INFO - Successfully connected to Neo4j at bolt://localhost:7687
+2025-10-04 21:23:13,998 - utils - INFO - ✅ Connected to Neo4j
+2025-10-04 21:23:13,999 - utils - INFO - Loading 5 suppliers...
+2025-10-04 21:23:14,064 - utils - INFO - ✅ Loaded 5 suppliers
+2025-10-04 21:23:14,064 - utils - INFO - Loading 5 products...
+2025-10-04 21:23:14,101 - utils - INFO - ✅ Loaded 5 products
+2025-10-04 21:23:14,101 - utils - INFO - Loading 5 warehouses...
+2025-10-04 21:23:14,140 - utils - INFO - ✅ Loaded 5 warehouses
+2025-10-04 21:23:14,141 - utils - INFO - Loading 5 customers...
+2025-10-04 21:23:14,177 - utils - INFO - ✅ Loaded 5 customers
+2025-10-04 21:23:14,177 - utils - INFO - Loading 8 shipments and relationships...
+2025-10-04 21:23:14,235 - data_loader - ERROR - Error executing Cypher query: {neo4j_code: Neo.ClientError.Schema.ConstraintValidationFailed} {message: Node(325) already exists with label `Shipment` and property `shipment_id` = 'SH1'} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Node(325) already exists with label `Shipment` and property `shipment_id` = 'SH1'}
+2025-10-04 21:23:14,235 - data_loader - ERROR - Query: 
+        MATCH (s:Supplier {supplier_id: $supplier_id})
+        MATCH (p:Product {product_id: $product_id})
+        MATCH (w:Warehouse {warehouse_id: $warehouse_id})
+
+        // Create shipment
+        CREATE (sh:Shipment {
+            shipment_id: $shipment_id,
+            qty_units: $qty_units,
+            planned_lead_time_days: $planned_lead_time_days,
+            actual_lead_time_days: $actual_lead_time_days,
+            status: $status,
+            created_at: datetime()
+        })
+
+        // Create SUPPLIES relationship
+        MERGE (s)-[:SUPPLIES {
+            lead_time_days: $planned_lead_time_days,
+            reliability: s.reliability_score,
+            total_volume: $qty_units
+        }]->(p)
+
+        // Create STOCKED_AT relationship
+        MERGE (p)-[:STOCKED_AT {
+            current_inventory: $qty_units,
+            reorder_point: p.safety_stock,
+            max_capacity: $qty_units * 2
+        }]->(w)
+
+        // Create CREATES relationship
+        CREATE (s)-[:CREATES {
+            shipment_date: date(),
+            volume: $qty_units
+        }]->(sh)
+
+        // Create CONTAINS relationship
+        CREATE (sh)-[:CONTAINS {
+            quantity: $qty_units,
+            unit_cost: 15.0
+        }]->(p)
+
+        // Create DELIVERED_TO relationship
+        CREATE (sh)-[:DELIVERED_TO {
+            transport_mode: 'Ground',
+            tracking_status: $status
+        }]->(w)
+        
+2025-10-04 21:23:14,235 - utils - ERROR - ❌ Data loading failed: {neo4j_code: Neo.ClientError.Schema.ConstraintValidationFailed} {message: Node(325) already exists with label `Shipment` and property `shipment_id` = 'SH1'} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Node(325) already exists with label `Shipment` and property `shipment_id` = 'SH1'}
+2025-10-04 21:23:14,239 - utils - ERROR - Traceback (most recent call last):
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/scripts/direct_load_data.py", line 445, in main
+    load_shipments_and_relationships(neo4j, data_path)
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/scripts/direct_load_data.py", line 181, in load_shipments_and_relationships
+    neo4j.execute_cypher(query, params)
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/src/data_loader.py", line 87, in execute_cypher
+    result = session.run(query, parameters or {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/work/session.py", line 320, in run
+    self._auto_result._run(
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/work/result.py", line 237, in _run
+    self._attach()
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/work/result.py", line 439, in _attach
+    self._connection.fetch_message()
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_common.py", line 192, in inner
+    func(*args, **kwargs)
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_bolt.py", line 866, in fetch_message
+    res = self._process_message(tag, fields)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_bolt5.py", line 496, in _process_message
+    response.on_failure(summary_metadata or {})
+  File "/Users/seungholee/Workspace/mini-foundry-supplychain/.venv/lib/python3.12/site-packages/neo4j/_sync/io/_common.py", line 262, in on_failure
+    raise self._hydrate_error(metadata)
+neo4j.exceptions.ConstraintError: {neo4j_code: Neo.ClientError.Schema.ConstraintValidationFailed} {message: Node(325) already exists with label `Shipment` and property `shipment_id` = 'SH1'} {gql_status: 50N42} {gql_status_description: error: general processing exception - unexpected error. Node(325) already exists with label `Shipment` and property `shipment_id` = 'SH1'}
+

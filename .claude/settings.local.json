@@ -28,7 +28,8 @@
       "Bash(docker system:*)",
       "Bash(docker builder:*)",
       "Bash(mkdir:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

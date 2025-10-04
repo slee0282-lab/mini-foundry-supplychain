@@ -167,7 +167,7 @@ class SupplyChainSimulator:
 
         shipments_df['planned_lead_time'] = shipments_df['planned_lead_time'].fillna(0).astype(float)
         shipments_df['actual_lead_time'] = shipments_df['actual_lead_time'].fillna(shipments_df['planned_lead_time']).astype(float)
-        shipments_df['current_lead_time'] = shipments_df['actual_lead_time'].replace(0, shipments_df['planned_lead_time'])
+        shipments_df['current_lead_time'] = shipments_df['actual_lead_time'].where(shipments_df['actual_lead_time'] > 0, shipments_df['planned_lead_time'])
         shipments_df['quantity'] = shipments_df['quantity'].fillna(0).astype(float)
         shipments_df['warehouse_region'] = shipments_df['warehouse_region'].fillna('Unknown')
         shipments_df['product_id'] = shipments_df['product_id'].fillna('').astype(str)
