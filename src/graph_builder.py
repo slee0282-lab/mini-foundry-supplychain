@@ -36,11 +36,23 @@ class SupplyChainGraphBuilder:
             self._add_customer_nodes(graph)
             self._add_shipment_nodes(graph)
 
+            # Add Phase 1 pilot data nodes
+            self._add_lot_nodes(graph)
+            self._add_event_nodes(graph)
+            self._add_sla_rule_nodes(graph)
+            self._add_lane_nodes(graph)
+            self._add_cost_nodes(graph)
+            self._add_cold_chain_reading_nodes(graph)
+
             # Add edges for relationships
             self._add_supply_relationships(graph)
             self._add_stocking_relationships(graph)
             self._add_delivery_relationships(graph)
             self._add_shipment_relationships(graph)
+
+            # Add Phase 1 relationships
+            self._add_lot_relationships(graph)
+            self._add_event_relationships(graph)
 
             self.graph = graph
             logger.info(f"Graph built: {graph.number_of_nodes()} nodes, {graph.number_of_edges()} edges")
