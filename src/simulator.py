@@ -36,6 +36,9 @@ class SupplyChainSimulator:
         self.graph_builder = SupplyChainGraphBuilder(self.neo4j)
         self.config = get_config()
 
+        # Repository root for resolving relative paths
+        self.repo_root = Path(__file__).resolve().parent.parent
+
         # Core simulation data
         self.original_graph = None
         self.current_graph = None
@@ -55,9 +58,22 @@ class SupplyChainSimulator:
         self._impacted_edges_cache = set()
 
         # Local data paths (used when Neo4j data is unavailable)
-        data_root = self.config['data'].get('path', './data') if self.config.get('data') else './data'
-        self.data_path = Path(data_root)
-        self.pilot_data_path = self.data_path / 'pilot_missing_supporting_files'
+        data_root_cfg = None
+        if self.config.get('data'):
+            data_root_cfg = self.config['data'].get('path')
+
+        if data_root_cfg:
+            data_root = Path(data_root_cfg)
+        else:
+            data_root = Path('data')
+
+        if not data_root.is_absolute():
+            data_root = (self.repo_root / data_root).resolve()
+
+        self.data_path = data_root
+        self.pilot_data_path = (data_root / 'pilot_missing_supporting_files').resolve()
+        logger.info(f"Simulator data path resolved to {self.data_path}")
+        logger.info(f"Simulator pilot data path resolved to {self.pilot_data_path}")
 
         # Initialize graph
         self._initialize_graph()
@@ -171,6 +187,7 @@ class SupplyChainSimulator:
 
         try:
             shipments_df = pd.read_csv(shipments_file)
+            logger.info(f"Loaded {len(shipments_df)} shipments from CSV {shipments_file}")
         except Exception as e:
             logger.error(f"Failed to read shipments CSV: {str(e)}")
             return pd.DataFrame()
@@ -413,6 +430,7 @@ class SupplyChainSimulator:
             if mapping_file.exists():
                 try:
                     schedule_df = pd.read_csv(mapping_file)
+                    logger.info(f"Loaded shipment-lot mapping CSV with {len(schedule_df)} rows from {mapping_file}")
                 except Exception as e:
                     logger.error(f"Failed to read shipment-lot CSV: {str(e)}")
                     schedule_df = pd.DataFrame()
