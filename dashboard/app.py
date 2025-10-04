@@ -401,247 +401,320 @@ def show_analytics_page(analytics):
 
 
 def show_simulation_page(simulator):
-    """Show the disruption simulation page."""
+    """Show the disruption simulation page with multiple scenario options."""
     st.header("🎯 Disruption Simulation")
-    st.markdown("*Simulate supplier delays and see the impact propagate through your supply chain*")
+    st.markdown("*Run disruption scenarios and visualize cascading impacts across the supply chain*")
 
-    # Check if graph is loaded
     status = simulator.get_simulation_status()
-
     if not status['graph_loaded']:
         st.error("Supply chain graph not loaded. Please check your data connection.")
         return
 
-    # Simulation controls
-    st.sidebar.header("🎛️ Simulation Controls")
+    st.sidebar.header("🎛️ Scenario Controls")
 
-    # Get available suppliers
-    suppliers = [n for n, d in simulator.current_graph.nodes(data=True)
-                if d.get('node_type') == 'supplier']
+    scenario_options = {
+        "Supplier Delay": "supplier_delay",
+        "Supplier Outage": "supplier_outage",
+        "Regulatory Hold": "regulatory_hold",
+        "Cold Chain Hold": "cold_chain_hold",
+        "Lot Recall Trace": "lot_recall_trace"
+    }
+    scenario_choice = st.sidebar.selectbox("Scenario Type", list(scenario_options.keys()))
+    scenario_type = scenario_options[scenario_choice]
 
-    if not suppliers:
-        st.error("No suppliers found in the supply chain graph.")
-        return
+    shipments_df = simulator.shipments_df
+    suppliers = [n for n, d in simulator.current_graph.nodes(data=True) if d.get('node_type') == 'supplier']
 
-    # Supplier selection with details
-    supplier_options = {}
-    for supplier_id in suppliers:
-        supplier_data = simulator.current_graph.nodes[supplier_id]
-        name = supplier_data.get('name', supplier_id)
-        region = supplier_data.get('region', 'Unknown')
-        reliability = supplier_data.get('reliability', 0.5)
-        supplier_options[f"{name} ({region}) - {reliability:.1%} reliability"] = supplier_id
+    scenario_args = {}
+    scenario_name = None
 
-    selected_supplier_display = st.sidebar.selectbox(
-        "Select Supplier to Impact:",
-        list(supplier_options.keys())
-    )
-    selected_supplier = supplier_options[selected_supplier_display]
+    if scenario_type in {"supplier_delay", "supplier_outage"}:
+        if not suppliers:
+            st.error("No suppliers found in the supply chain graph.")
+            return
 
-    # Delay configuration
-    delay_days = st.sidebar.slider(
-        "Delay Duration (days):",
-        min_value=1,
-        max_value=21,
-        value=5,
-        help="Number of days to delay the supplier"
-    )
+        supplier_options = {}
+        for supplier_id in suppliers:
+            supplier_data = simulator.current_graph.nodes[supplier_id]
+            name = supplier_data.get('name', supplier_id)
+            region = supplier_data.get('region', 'Unknown')
+            reliability = supplier_data.get('reliability', 0.5)
+            supplier_options[f"{name} ({region}) – {reliability:.1%} reliability"] = supplier_id
 
-    # Expedite toggle
-    expedite_recovery = st.sidebar.checkbox(
-        "Apply Expedite Recovery",
-        value=False,
-        help="Apply expedite shipments for late orders to recover SLA (incurs additional cost)."
-    )
+        selected_supplier_display = st.sidebar.selectbox("Supplier", list(supplier_options.keys()))
+        selected_supplier = supplier_options[selected_supplier_display]
+        scenario_args['supplier_id'] = selected_supplier
 
-    # Simulation naming
-    scenario_name = st.sidebar.text_input(
-        "Scenario Name (optional):",
-        placeholder=f"Delay_{selected_supplier}_{delay_days}d"
-    )
+    if scenario_type == "supplier_delay":
+        delay_days = st.sidebar.slider("Delay Duration (days)", 1, simulator.config['simulation']['max_delay_days'], simulator.config['simulation']['default_delay_days'])
+        expedite_recovery = st.sidebar.checkbox("Apply Expedite Recovery", value=False)
+        scenario_name = st.sidebar.text_input("Scenario Name (optional)", value=f"Delay_{scenario_args['supplier_id']}_{delay_days}d") or None
+        scenario_args.update({'delay_days': delay_days, 'expedite': expedite_recovery, 'scenario_name': scenario_name})
 
-    # Run simulation button
-    if st.sidebar.button("🔴 Run Simulation", type="primary"):
-        with st.spinner("Running disruption simulation..."):
+    elif scenario_type == "supplier_outage":
+        outage_days = st.sidebar.slider("Outage Duration (days)", 3, 30, 14)
+        outage_start_input = st.sidebar.date_input("Outage Start (optional)", value=None)
+        expedite_recovery = st.sidebar.checkbox("Apply Expedite Recovery", value=False)
+        scenario_name = st.sidebar.text_input("Scenario Name (optional)", value=f"Outage_{scenario_args['supplier_id']}_{outage_days}d") or None
+        outage_start = datetime.combine(outage_start_input, datetime.min.time()) if outage_start_input else None
+        scenario_args.update({'outage_days': outage_days, 'start_date': outage_start, 'scenario_name': scenario_name, 'expedite': expedite_recovery})
+
+    elif scenario_type == "regulatory_hold":
+        if shipments_df.empty:
+            st.error("Shipment data not available; cannot run regional scenarios.")
+            return
+
+        regions = sorted(r for r in shipments_df['warehouse_region'].dropna().unique() if r)
+        if not regions:
+            st.error("No warehouse regions found in shipment data.")
+            return
+
+        selected_region = st.sidebar.selectbox("Destination Region", regions)
+        hold_days = st.sidebar.slider("Hold Duration (days)", 1, 21, 4)
+        expedite_recovery = st.sidebar.checkbox("Apply Expedite Recovery", value=False)
+        scenario_name = st.sidebar.text_input("Scenario Name (optional)", value=f"RegHold_{selected_region}_{hold_days}d") or None
+        scenario_args.update({'region': selected_region, 'hold_days': hold_days, 'scenario_name': scenario_name, 'expedite': expedite_recovery})
+
+    elif scenario_type == "cold_chain_hold":
+        if simulator.cold_chain_df.empty:
+            st.error("Cold chain data not available.")
+            return
+
+        shipments_with_readings = sorted(simulator.cold_chain_df['shipment_id'].dropna().unique())
+        focus_option = st.sidebar.selectbox("Focus Shipment (optional)", ["-- All excursions --"] + shipments_with_readings)
+        focus_shipment = None if focus_option == "-- All excursions --" else focus_option
+        extension_days = st.sidebar.slider("Hold Extension (days)", 1, 14, 5)
+        scenario_name = st.sidebar.text_input("Scenario Name (optional)", value=f"ColdChainHold_{extension_days}d") or None
+        scenario_args.update({'hold_extension_days': extension_days, 'focus_shipment': focus_shipment, 'scenario_name': scenario_name})
+
+    elif scenario_type == "lot_recall_trace":
+        if simulator.lots_df.empty:
+            st.error("Lot data not available.")
+            return
+
+        recall_candidates = simulator.lots_df.copy()
+        if 'recall_status' in recall_candidates.columns:
+            recall_candidates = recall_candidates[recall_candidates['recall_status'].astype(str).str.upper().str.contains('RECALL') |
+                                               recall_candidates['status'].astype(str).str.upper().str.contains('RECALL')]
+        if recall_candidates.empty:
+            recall_candidates = simulator.lots_df
+
+        lot_options = recall_candidates['lot_id'].tolist()
+        selected_lot = st.sidebar.selectbox("Lot ID", lot_options)
+        scenario_name = st.sidebar.text_input("Scenario Name (optional)", value=f"LotRecall_{selected_lot}") or None
+        scenario_args.update({'lot_id': selected_lot, 'scenario_name': scenario_name})
+
+    run_label = "🔴 Run Scenario" if scenario_type != 'lot_recall_trace' else "🔍 Trace Lot"
+
+    if st.sidebar.button(run_label, type="primary"):
+        with st.spinner("Running scenario..."):
             try:
-                scenario = simulator.simulate_supplier_delay(
-                    selected_supplier,
-                    delay_days,
-                    scenario_name or None,
-                    expedite=expedite_recovery
-                )
+                if scenario_type == 'supplier_delay':
+                    scenario = simulator.simulate_supplier_delay(
+                        supplier_id=scenario_args['supplier_id'],
+                        delay_days=scenario_args['delay_days'],
+                        scenario_name=scenario_args['scenario_name'],
+                        expedite=scenario_args['expedite']
+                    )
+                elif scenario_type == 'supplier_outage':
+                    scenario = simulator.simulate_supplier_outage(
+                        supplier_id=scenario_args['supplier_id'],
+                        outage_days=scenario_args['outage_days'],
+                        start_date=scenario_args['start_date'],
+                        scenario_name=scenario_args['scenario_name'],
+                        expedite=scenario_args['expedite']
+                    )
+                elif scenario_type == 'regulatory_hold':
+                    scenario = simulator.simulate_regional_hold(
+                        region=scenario_args['region'],
+                        hold_days=scenario_args['hold_days'],
+                        scenario_name=scenario_args['scenario_name'],
+                        expedite=scenario_args['expedite']
+                    )
+                elif scenario_type == 'cold_chain_hold':
+                    scenario = simulator.simulate_cold_chain_excursion(
+                        hold_extension_days=scenario_args['hold_extension_days'],
+                        focus_shipment=scenario_args['focus_shipment'],
+                        scenario_name=scenario_args['scenario_name']
+                    )
+                else:  # lot recall trace
+                    scenario = simulator.trace_lot_recall(
+                        lot_id=scenario_args['lot_id'],
+                        scenario_name=scenario_args['scenario_name']
+                    )
 
                 st.session_state['last_simulation'] = scenario
-                st.success("✅ Simulation completed successfully!")
+                st.success("✅ Scenario completed successfully!")
 
             except Exception as e:
-                st.error(f"Simulation failed: {str(e)}")
-                return
+                st.error(f"Scenario failed: {str(e)}")
 
-    # Reset simulation
     if st.sidebar.button("🔄 Reset Simulation"):
         simulator.reset_simulation()
-        if 'last_simulation' in st.session_state:
-            del st.session_state['last_simulation']
-        st.success("Simulation reset to original state")
+        st.session_state.pop('last_simulation', None)
+        st.success("Simulation state reset")
 
-    # Display simulation results
     if 'last_simulation' in st.session_state:
         scenario = st.session_state['last_simulation']
-        results = scenario['results']
+        results = scenario.get('results', {})
+        scenario_type = results.get('scenario_type', scenario.get('type'))
 
-        # Key results summary
-        st.subheader("📊 Simulation Results")
+        st.subheader(f"📊 Results — {scenario.get('name', 'Scenario')}")
 
-        kpis = results['kpis']
-        baseline_late = simulator.baseline_metrics.get('late_orders', 0)
-        expedite_enabled = results['simulation_parameters']['expedite_enabled']
+        if scenario_type in {'supplier_delay', 'supplier_outage', 'regulatory_hold', 'cold_chain_hold'}:
+            kpis = results.get('kpis', {})
+            if kpis:
+                baseline_late = simulator.baseline_metrics.get('late_orders', 0)
+                expedite_enabled = kpis.get('expedite_cost_total', 0) > 0 if 'expedite_cost_total' in kpis else False
 
-        col1, col2, col3, col4 = st.columns(4)
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("SLA (Post-Scenario)", f"{kpis.get('new_sla', 0):.1f}%", delta=f"{kpis.get('delta_sla', 0):.1f} pp")
+                with col2:
+                    st.metric("Baseline SLA", f"{kpis.get('baseline_sla', 0):.1f}%")
+                with col3:
+                    st.metric("Late Orders", int(kpis.get('late_orders_after_delay', 0)),
+                              delta=f"{int(kpis.get('late_orders_after_delay', 0)) - baseline_late:+d}")
+                with col4:
+                    if expedite_enabled:
+                        st.metric("Expedite Cost", f"${kpis.get('expedite_cost_total', 0):,.0f}")
+                    else:
+                        st.metric("Late (No Recovery)", int(kpis.get('late_orders_without_recovery', 0)),
+                                  delta=f"{int(kpis.get('late_orders_without_recovery', 0)) - baseline_late:+d}")
 
-        with col1:
-            st.metric(
-                "SLA (Post-Scenario)",
-                f"{kpis['new_sla']:.1f}%",
-                delta=f"{kpis['delta_sla']:.1f} pp"
-            )
+                if expedite_enabled:
+                    st.info("Expedite recovery applied: late shipments recovered at additional cost.")
+                elif kpis.get('late_orders_without_recovery', 0) > 0:
+                    st.warning("Late orders calculated without recovery. Enable expedite to estimate recovery costs.")
 
-        with col2:
-            st.metric(
-                "Baseline SLA",
-                f"{kpis['baseline_sla']:.1f}%",
-                delta=None
-            )
-
-        with col3:
-            st.metric(
-                "Late Orders",
-                int(kpis['late_orders_after_delay']),
-                delta=f"{int(kpis['late_orders_after_delay']) - baseline_late:+d}"
-            )
-
-        with col4:
-            if expedite_enabled:
-                st.metric(
-                    "Expedite Cost",
-                    f"${kpis['expedite_cost_total']:,.0f}",
-                    delta=None
-                )
-            else:
-                st.metric(
-                    "Late Orders (No Recovery)",
-                    int(kpis['late_orders_without_recovery']),
-                    delta=f"{int(kpis['late_orders_without_recovery']) - baseline_late:+d}"
-                )
-
-        if expedite_enabled:
-            st.info("Expedite recovery applied: late shipments are recovered at additional cost.")
-        elif kpis['late_orders_without_recovery'] > 0:
-            st.warning("Late orders calculated without expedite recovery. Toggle expedite to estimate recovery cost.")
-
-        # Regional impact analysis
-        st.subheader("🌍 Regional Impact Analysis")
-
-        regional_df = pd.DataFrame(results['regional_impacts'])
-        if not regional_df.empty:
-            regional_df = regional_df.sort_values('delta_sla')
-
-            col_left, col_right = st.columns(2)
-
-            with col_left:
-                fig_regional = px.bar(
-                    regional_df,
-                    x='region',
-                    y='delta_sla',
-                    title="Δ SLA vs Baseline by Region",
-                    color='delta_sla',
-                    color_continuous_scale=['red', 'orange', 'green']
-                )
-                fig_regional.update_layout(yaxis_title='Δ SLA (pp)')
-                st.plotly_chart(fig_regional, use_container_width=True)
-
-            with col_right:
-                display_df = regional_df.rename(columns={
-                    'region': 'Region',
-                    'baseline_sla': 'Baseline SLA (%)',
-                    'new_sla': 'New SLA (%)',
-                    'delta_sla': 'Δ SLA (pp)',
-                    'late_orders': 'Late Orders',
-                    'late_orders_without_recovery': 'Late (No Recovery)',
-                    'expedite_cost': 'Expedite Cost ($)',
-                    'shipments': '# Shipments'
-                })
-                st.dataframe(
-                    display_df.style.format({
+            regional_impacts = results.get('regional_impacts', [])
+            st.subheader("🌍 Regional Impact Analysis")
+            if regional_impacts:
+                regional_df = pd.DataFrame(regional_impacts)
+                regional_df = regional_df.sort_values('delta_sla')
+                col_left, col_right = st.columns(2)
+                with col_left:
+                    fig_regional = px.bar(
+                        regional_df,
+                        x='region',
+                        y='delta_sla',
+                        title="Δ SLA vs Baseline by Region",
+                        color='delta_sla',
+                        color_continuous_scale=['red', 'orange', 'green']
+                    )
+                    fig_regional.update_layout(yaxis_title='Δ SLA (pp)')
+                    st.plotly_chart(fig_regional, use_container_width=True)
+                with col_right:
+                    display_df = regional_df.rename(columns={
+                        'region': 'Region',
+                        'baseline_sla': 'Baseline SLA (%)',
+                        'new_sla': 'New SLA (%)',
+                        'delta_sla': 'Δ SLA (pp)',
+                        'late_orders': 'Late Orders',
+                        'late_orders_without_recovery': 'Late (No Recovery)',
+                        'expedite_cost': 'Expedite Cost ($)',
+                        'shipments': '# Shipments'
+                    })
+                    st.dataframe(display_df.style.format({
                         'Baseline SLA (%)': '{:.1f}',
                         'New SLA (%)': '{:.1f}',
                         'Δ SLA (pp)': '{:.1f}',
                         'Expedite Cost ($)': '${:,.0f}'
-                    }),
-                    use_container_width=True
-                )
-        else:
-            st.info("No regional data available for this scenario.")
+                    }), use_container_width=True)
+            else:
+                st.info("No regional impacts calculated for this scenario.")
 
-        # Impacted shipments list
-        st.subheader("🛒 Impacted Shipments")
-
-        impacted_shipments = results['impacted_shipments']
-        if impacted_shipments:
-            impacted_df = pd.DataFrame(impacted_shipments)
-            display_impacted = impacted_df.rename(columns={
-                'shipment_id': 'Shipment',
-                'supplier_id': 'Supplier',
-                'product_id': 'Product',
-                'product_name': 'Product Name',
-                'warehouse_id': 'Warehouse',
-                'warehouse_region': 'Region',
-                'quantity': 'Quantity',
-                'current_lead_time': 'Baseline Lead (days)',
-                'delayed_lead_time': 'Delayed Lead (days)',
-                'promised_days': 'Promised SLA (days)',
-                'expedited': 'Expedited',
-                'expedite_cost': 'Expedite Cost ($)'
-            })
-
-            st.dataframe(
-                display_impacted.style.format({
+            impacted_shipments = results.get('impacted_shipments', [])
+            st.subheader("🛒 Impacted Shipments")
+            if impacted_shipments:
+                impacted_df = pd.DataFrame(impacted_shipments)
+                display_impacted = impacted_df.rename(columns={
+                    'shipment_id': 'Shipment',
+                    'supplier_id': 'Supplier',
+                    'product_id': 'Product',
+                    'product_name': 'Product Name',
+                    'warehouse_id': 'Warehouse',
+                    'warehouse_region': 'Region',
+                    'quantity': 'Quantity',
+                    'current_lead_time': 'Baseline Lead (days)',
+                    'delayed_lead_time': 'Delayed Lead (days)',
+                    'promised_days': 'Promised SLA (days)',
+                    'expedited': 'Expedited',
+                    'expedite_cost': 'Expedite Cost ($)'
+                })
+                st.dataframe(display_impacted.style.format({
                     'Baseline Lead (days)': '{:.1f}',
                     'Delayed Lead (days)': '{:.1f}',
                     'Promised SLA (days)': '{:.0f}',
                     'Expedite Cost ($)': '${:,.0f}'
-                }),
-                use_container_width=True
-            )
+                }), use_container_width=True)
+                csv_name = scenario.get('name', 'scenario_results').replace(' ', '_') + '.csv'
+                st.download_button("⬇️ Download Impacted Shipments", display_impacted.to_csv(index=False).encode('utf-8'), csv_name, mime="text/csv")
+            else:
+                st.success("No shipments breach SLA under the current scenario.")
 
-            csv_data = display_impacted.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                "⬇️ Download Impacted Shipments",
-                data=csv_data,
-                file_name=f"impacted_shipments_{selected_supplier}_{delay_days}d.csv",
-                mime="text/csv"
-            )
+            if scenario_type == 'supplier_outage' and 'resilience_metrics' in results:
+                resilience = results['resilience_metrics']
+                st.subheader("🛡️ Resilience Insights")
+                col_a, col_b = st.columns(2)
+                col_a.metric("Shipments Impacted", resilience.get('shipments_impacted', 0))
+                col_b.metric("Potential Backorders (units)", f"{resilience.get('potential_backorders_units', 0):,.0f}")
+                breaches = resilience.get('safety_stock_breaches', [])
+                if breaches:
+                    st.warning(f"Safety stock breached for {len(breaches)} product(s).")
+                    st.dataframe(pd.DataFrame(breaches).rename(columns={'product_id': 'Product', 'product_name': 'Product Name'}), use_container_width=True)
+
+            if scenario_type == 'regulatory_hold' and 'regional_hold' in results:
+                hold_info = results['regional_hold']
+                st.subheader("🚛 Lane Impact")
+                if hold_info['lanes']:
+                    lane_df = pd.DataFrame(hold_info['lanes']).rename(columns={
+                        'supplier_id': 'Supplier',
+                        'warehouse_id': 'Warehouse',
+                        'total_quantity': 'Quantity (units)',
+                        'late_orders_without_recovery': 'Late (No Recovery)',
+                        'late_orders_after_mitigation': 'Late (Post-Mitigation)'
+                    })
+                    st.dataframe(lane_df, use_container_width=True)
+                else:
+                    st.info("No lane-level impacts calculated.")
+
+            if scenario_type == 'cold_chain_hold' and 'cold_chain' in results:
+                st.subheader("❄️ Excursion Details")
+                cold_info = results['cold_chain']
+                st.write(f"Hold extension applied: **{cold_info.get('hold_extension_days', 0)} days**")
+                if cold_info['metrics']:
+                    st.dataframe(pd.DataFrame(cold_info['metrics']).rename(columns={
+                        'shipment_id': 'Shipment',
+                        'max_temp': 'Max Temp (°C)',
+                        'min_temp': 'Min Temp (°C)',
+                        'reading_count': '# Readings',
+                        'max_excursion_minutes': 'Max Excursion (min)'
+                    }), use_container_width=True)
+
+        elif scenario_type == 'lot_recall_trace':
+            results = scenario.get('results', {})
+            lot_info = results.get('lot', {})
+            st.subheader(f"🧪 Lot {lot_info.get('lot_id', 'N/A')} Recall Trace")
+            st.write(f"Status: **{lot_info.get('recall_status', lot_info.get('status', 'Unknown'))}**")
+            shipments = results.get('shipments_impacted', [])
+            warehouses = results.get('warehouses_impacted', [])
+            st.metric("Shipments Impacted", len(shipments))
+            st.metric("Warehouses Impacted", len(warehouses))
+            if shipments:
+                st.dataframe(pd.DataFrame(shipments), use_container_width=True)
+            st.markdown(results.get('summary', ''))
+
         else:
-            st.success("No shipments breach SLA under the current scenario.")
+            st.info("Scenario executed, but no structured results are available to display.")
 
-        # Simulation summary
         st.subheader("📋 Executive Summary")
-        st.markdown(results['summary'])
+        summary_text = results.get('summary', scenario.get('name', 'Scenario completed.'))
+        st.markdown(summary_text)
 
     else:
-        # Show simulation guidance
-        st.info("👆 Select a supplier and delay duration in the sidebar, then click 'Run Simulation' to see the impact.")
+        st.info("👆 Configure a scenario in the sidebar and click **Run Scenario** to begin.")
 
-        # Show simulation history
-        st.subheader("📜 Recent Simulations")
-
-        recent_sims = status['recent_simulations']
-        if recent_sims:
-            history_df = pd.DataFrame(recent_sims)
-            history_df['timestamp'] = pd.to_datetime(history_df['timestamp']).dt.strftime('%Y-%m-%d %H:%M')
-            st.dataframe(history_df, use_container_width=True)
-        else:
-            st.write("No simulations run yet.")
 
 
 def show_risk_analysis_page(analytics):
