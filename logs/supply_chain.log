@@ -635,3 +635,41 @@ Verifying data load...
 2025-10-04 19:31:05,041 - utils - INFO - ✓ PILOT DATA LOAD COMPLETE
 2025-10-04 19:31:05,041 - utils - INFO - ============================================================
 2025-10-04 19:31:05,041 - data_loader - INFO - Neo4j connection closed
+2025-10-04 19:42:56,228 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 19:42:56,228 - utils - INFO - ============================================================
+2025-10-04 19:42:56,228 - utils - INFO - PILOT SUPPORTING DATA LOADER
+2025-10-04 19:42:56,228 - utils - INFO - ============================================================
+2025-10-04 19:42:56,228 - data_loader - INFO - Neo4j connection config: URI=neo4j+s://6ec12f7c.databases.neo4j.io, USER=neo4j
+2025-10-04 19:42:56,228 - data_loader - INFO - Using Neo4j driver only (Aura mode)
+2025-10-04 19:42:57,493 - data_loader - INFO - Successfully connected to Neo4j at neo4j+s://6ec12f7c.databases.neo4j.io
+2025-10-04 19:42:57,493 - utils - INFO - Starting pilot data load...
+2025-10-04 19:42:57,493 - utils - INFO - Loading SLA rules...
+2025-10-04 19:42:57,864 - utils - INFO - ✓ Loaded 40 SLA rules
+2025-10-04 19:42:57,865 - utils - INFO - Loading lanes...
+2025-10-04 19:42:58,064 - utils - INFO - ✓ Loaded 45 lanes
+2025-10-04 19:42:58,064 - utils - INFO - Loading costs...
+2025-10-04 19:42:58,321 - utils - INFO - ✓ Loaded 62 cost records
+2025-10-04 19:42:58,322 - utils - INFO - Loading lots...
+2025-10-04 19:42:58,570 - utils - INFO - ✓ Loaded 50 lots
+2025-10-04 19:42:58,570 - utils - INFO - Loading shipment-lot mappings...
+2025-10-04 19:42:58,840 - utils - INFO - ✓ Loaded 45 shipment-lot mappings
+2025-10-04 19:42:58,840 - utils - INFO - Loading cold chain readings...
+2025-10-04 19:42:59,127 - utils - INFO - ✓ Loaded 64 cold chain readings
+2025-10-04 19:42:59,127 - utils - INFO - Loading events...
+2025-10-04 19:43:00,006 - utils - INFO - ✓ Loaded 44 events
+2025-10-04 19:43:00,006 - utils - INFO - ✓ All pilot data loaded successfully
+2025-10-04 19:43:00,006 - utils - INFO - 
+Verifying data load...
+2025-10-04 19:43:00,134 - utils - INFO -   SLARule: 40
+2025-10-04 19:43:00,291 - utils - INFO -   Lane: 45
+2025-10-04 19:43:00,425 - utils - INFO -   Cost: 62
+2025-10-04 19:43:00,560 - utils - INFO -   Lot: 50
+2025-10-04 19:43:00,693 - utils - INFO -   CONTAINS relationships: 53
+2025-10-04 19:43:00,818 - utils - INFO -   ColdChainReading: 64
+2025-10-04 19:43:00,947 - utils - INFO -   Event: 44
+2025-10-04 19:43:01,074 - utils - INFO -   IMPACTS relationships: 44
+2025-10-04 19:43:01,075 - utils - INFO - 
+============================================================
+2025-10-04 19:43:01,075 - utils - INFO - ✓ PILOT DATA LOAD COMPLETE
+2025-10-04 19:43:01,075 - utils - INFO - ============================================================
+2025-10-04 19:43:01,075 - data_loader - INFO - Neo4j connection closed

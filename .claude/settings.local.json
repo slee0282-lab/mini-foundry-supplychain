@@ -27,7 +27,8 @@
       "Bash(docker network prune:*)",
       "Bash(docker system:*)",
       "Bash(docker builder:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
