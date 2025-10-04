@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(python3 -m pip:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv run:*)",
+      "Bash(docker exec:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(open https://neo4j.com/cloud/aura-free/)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(export NEO4J_URI=\"neo4j+s://etn7hffolaixlqu.databases.neo4j.io\")",
+      "Bash(export NEO4J_USER=\"neo4j\")",
+      "Bash(export NEO4J_PASSWORD=\"etn7HffOlAiXlqU31cvhp7IXKxMXMsnSuVV3UqF06EA\")",
+      "Bash(export NEO4J_URI=\"neo4j+s://6ec12f7c.databases.neo4j.io\")",
+      "Bash(git pull:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
