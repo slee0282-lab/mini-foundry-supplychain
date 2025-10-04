@@ -17,7 +17,8 @@
       "Bash(export NEO4J_PASSWORD=\"etn7HffOlAiXlqU31cvhp7IXKxMXMsnSuVV3UqF06EA\")",
       "Bash(export NEO4J_URI=\"neo4j+s://6ec12f7c.databases.neo4j.io\")",
       "Bash(git pull:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(docker stop:*)"
     ],
     "deny": [],
     "ask": []
