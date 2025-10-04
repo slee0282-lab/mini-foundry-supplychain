@@ -587,3 +587,51 @@ Next steps:
 2025-10-01 19:46:29,437 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
 2025-10-01 19:49:01,411 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
 2025-10-01 19:56:25,683 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 19:29:49,529 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 19:29:49,530 - utils - INFO - ============================================================
+2025-10-04 19:29:49,530 - utils - INFO - PILOT SUPPORTING DATA LOADER
+2025-10-04 19:29:49,530 - utils - INFO - ============================================================
+2025-10-04 19:29:49,530 - data_loader - INFO - Neo4j connection config: URI=bolt://localhost:7687, USER=neo4j
+2025-10-04 19:29:49,689 - data_loader - INFO - Successfully connected to Neo4j at bolt://localhost:7687
+2025-10-04 19:29:49,690 - utils - INFO - Starting pilot data load...
+2025-10-04 19:29:49,690 - utils - INFO - Loading SLA rules...
+2025-10-04 19:29:49,693 - utils - ERROR - Error loading pilot data: 'Neo4jConnection' object has no attribute 'execute_query'
+2025-10-04 19:29:49,693 - utils - ERROR - Failed to load pilot data: 'Neo4jConnection' object has no attribute 'execute_query'
+2025-10-04 19:31:03,391 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-04 19:31:03,391 - utils - INFO - ============================================================
+2025-10-04 19:31:03,391 - utils - INFO - PILOT SUPPORTING DATA LOADER
+2025-10-04 19:31:03,391 - utils - INFO - ============================================================
+2025-10-04 19:31:03,391 - data_loader - INFO - Neo4j connection config: URI=bolt://localhost:7687, USER=neo4j
+2025-10-04 19:31:03,449 - data_loader - INFO - Successfully connected to Neo4j at bolt://localhost:7687
+2025-10-04 19:31:03,449 - utils - INFO - Starting pilot data load...
+2025-10-04 19:31:03,449 - utils - INFO - Loading SLA rules...
+2025-10-04 19:31:04,247 - utils - INFO - ✓ Loaded 40 SLA rules
+2025-10-04 19:31:04,248 - utils - INFO - Loading lanes...
+2025-10-04 19:31:04,330 - utils - INFO - ✓ Loaded 45 lanes
+2025-10-04 19:31:04,330 - utils - INFO - Loading costs...
+2025-10-04 19:31:04,454 - utils - INFO - ✓ Loaded 62 cost records
+2025-10-04 19:31:04,454 - utils - INFO - Loading lots...
+2025-10-04 19:31:04,559 - utils - INFO - ✓ Loaded 50 lots
+2025-10-04 19:31:04,559 - utils - INFO - Loading shipment-lot mappings...
+2025-10-04 19:31:04,623 - utils - INFO - ✓ Loaded 45 shipment-lot mappings
+2025-10-04 19:31:04,623 - utils - INFO - Loading cold chain readings...
+2025-10-04 19:31:04,719 - utils - INFO - ✓ Loaded 64 cold chain readings
+2025-10-04 19:31:04,719 - utils - INFO - Loading events...
+2025-10-04 19:31:04,901 - utils - INFO - ✓ Loaded 44 events
+2025-10-04 19:31:04,901 - utils - INFO - ✓ All pilot data loaded successfully
+2025-10-04 19:31:04,901 - utils - INFO - 
+Verifying data load...
+2025-10-04 19:31:04,929 - utils - INFO -   SLARule: 40
+2025-10-04 19:31:04,942 - utils - INFO -   Lane: 45
+2025-10-04 19:31:04,954 - utils - INFO -   Cost: 62
+2025-10-04 19:31:04,967 - utils - INFO -   Lot: 50
+2025-10-04 19:31:05,005 - neo4j.notifications - WARNING - Received notification from DBMS server: <GqlStatusObject gql_status='01N42', status_description="One of the relationship types in your query is not available in the database, make sure you didn't misspell it or that the label is available when you run this statement in your application (the missing relationship type is: CONTAINS)", position=<SummaryInputPosition line=1, column=13, offset=12>, raw_classification='UNRECOGNIZED', classification=<NotificationClassification.UNRECOGNIZED: 'UNRECOGNIZED'>, raw_severity='WARNING', severity=<NotificationSeverity.WARNING: 'WARNING'>, diagnostic_record={'OPERATION': '', 'OPERATION_CODE': '0', 'CURRENT_SCHEMA': '/', '_classification': 'UNRECOGNIZED', '_severity': 'WARNING', '_position': {'column': 13, 'offset': 12, 'line': 1}}> for query: 'MATCH ()-[r:CONTAINS]->() RETURN count(r) as count'
+2025-10-04 19:31:05,005 - utils - INFO -   CONTAINS relationships: 0
+2025-10-04 19:31:05,016 - utils - INFO -   ColdChainReading: 64
+2025-10-04 19:31:05,026 - utils - INFO -   Event: 44
+2025-10-04 19:31:05,041 - utils - INFO -   IMPACTS relationships: 9
+2025-10-04 19:31:05,041 - utils - INFO - 
+============================================================
+2025-10-04 19:31:05,041 - utils - INFO - ✓ PILOT DATA LOAD COMPLETE
+2025-10-04 19:31:05,041 - utils - INFO - ============================================================
+2025-10-04 19:31:05,041 - data_loader - INFO - Neo4j connection closed

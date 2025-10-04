@@ -20,7 +20,14 @@
       "Bash(lsof:*)",
       "Bash(docker stop:*)",
       "Bash(docker logs:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker rmi:*)",
+      "Bash(docker volume prune:*)",
+      "Bash(docker network prune:*)",
+      "Bash(docker system:*)",
+      "Bash(docker builder:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

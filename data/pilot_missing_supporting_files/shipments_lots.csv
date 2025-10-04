@@ -1,0 +1,46 @@
+shipment_lot_id,shipment_id,lot_id,quantity_units,packing_date,shipping_date,temperature_monitored,notes
+SL001,SH1,L001,400,2024-01-10,2024-01-12,YES,Full shipment from single lot - RECALLED LOT
+SL002,SH2,L009,180,2024-01-08,2024-01-10,NO,Partial shipment - API
+SL003,SH2,L010,170,2024-01-08,2024-01-10,NO,Partial shipment - API mixed lots
+SL004,SH3,L016,220,2024-01-05,2024-01-07,NO,Full shipment - diagnostic kits
+SL005,SH4,L024,190,2024-01-12,2024-01-15,YES,Partial shipment - biologics cold chain
+SL006,SH4,L026,190,2024-01-12,2024-01-15,YES,Partial shipment - biologics mixed lots
+SL007,SH5,L031,260,2024-01-15,2024-01-18,NO,Full shipment - generics
+SL008,SH6,L009,150,2024-01-14,2024-01-16,NO,Partial shipment - API
+SL009,SH6,L014,150,2024-01-14,2024-01-16,NO,Partial shipment - API mixed lots
+SL010,SH7,L002,250,2024-01-10,2024-01-12,YES,Partial shipment - vaccines
+SL011,SH7,L003,200,2024-01-10,2024-01-12,YES,Partial shipment - vaccines mixed lots
+SL012,SH8,L026,150,2024-01-18,2024-01-20,YES,Partial shipment - biologics
+SL013,SH8,L027,140,2024-01-18,2024-01-20,YES,Partial shipment - biologics mixed lots
+SL014,SH1,L037,200,2024-01-22,2024-01-24,YES,Additional lot added - HOLD due to cold chain
+SL015,SH3,L017,150,2024-01-20,2024-01-22,NO,Additional diagnostic lot
+SL016,SH5,L033,180,2024-01-25,2024-01-28,NO,Additional generics lot
+SL017,SH2,L011,120,2024-01-28,2024-01-30,NO,Late addition - API
+SL018,SH4,L028,100,2024-02-01,2024-02-03,YES,Emergency replenishment - biologics
+SL019,SH6,L039,80,2024-02-05,2024-02-07,NO,Top-up shipment - API
+SL020,SH7,L004,120,2024-02-08,2024-02-10,YES,Additional vaccine lot
+SL021,SH1,L005,150,2024-01-15,2024-01-17,YES,Mixed lot - RECALLED due to stability failure
+SL022,SH3,L018,180,2024-01-25,2024-01-27,NO,Single lot - RECALLED due to cross-contamination
+SL023,SH2,L012,200,2024-02-01,2024-02-03,NO,HOLD lot - labeling error partial recall
+SL024,SH4,L025,220,2024-02-05,2024-02-07,YES,RECALLED lot - OOS result
+SL025,SH6,L015,100,2024-02-10,2024-02-12,NO,RECALLED lot - foreign particle
+SL026,SH8,L030,90,2024-02-15,2024-02-17,YES,RECALLED lot - raw material defect
+SL027,SH5,L032,300,2024-02-01,2024-02-04,NO,Generic drug - large lot
+SL028,SH1,L007,180,2024-02-08,2024-02-10,YES,HOLD lot - minor potency deviation
+SL029,SH7,L006,200,2024-02-12,2024-02-14,YES,Approved vaccine lot
+SL030,SH3,L020,150,2024-02-15,2024-02-17,NO,Fresh diagnostic kit lot
+SL031,SH4,L029,120,2024-02-18,2024-02-20,YES,Biologics approved lot
+SL032,SH2,L013,140,2024-02-20,2024-02-22,NO,API approved lot
+SL033,SH5,L034,280,2024-02-22,2024-02-25,NO,Generics large shipment
+SL034,SH6,L040,160,2024-02-25,2024-02-27,NO,API replenishment
+SL035,SH7,L008,220,2024-02-28,2024-03-02,YES,Vaccine approved lot
+SL036,SH8,L042,110,2024-03-01,2024-03-03,YES,Biologics fresh lot
+SL037,SH1,L037,180,2024-03-05,2024-03-07,YES,HOLD lot - cold chain excursion investigation
+SL038,SH3,L041,140,2024-03-08,2024-03-10,NO,HOLD lot - packaging integrity check
+SL039,SH4,L050,130,2024-03-10,2024-03-12,YES,HOLD lot - shipping delay investigation
+SL040,SH2,L045,170,2024-03-12,2024-03-14,NO,API fresh lot approved
+SL041,SH5,L043,250,2024-03-15,2024-03-18,NO,Generics Africa distribution
+SL042,SH6,L039,120,2024-03-18,2024-03-20,NO,API Europe distribution
+SL043,SH7,L038,190,2024-03-20,2024-03-22,YES,Vaccine North America distribution
+SL044,SH8,L047,100,2024-03-22,2024-03-24,YES,Biologics Europe distribution
+SL045,SH1,L049,160,2024-03-25,2024-03-27,YES,HOLD lot - temperature deviation investigation
