@@ -804,6 +804,8 @@ def show_network_explorer_page(simulator, analytics):
 
             # Add edges
             for edge in simulator.current_graph.edges():
+                if edge[0] not in positions or edge[1] not in positions:
+                    continue
                 x0, y0 = positions[edge[0]]
                 x1, y1 = positions[edge[1]]
 
@@ -819,19 +821,27 @@ def show_network_explorer_page(simulator, analytics):
             # Add nodes
             node_types_colors = {
                 'supplier': '#87CEEB',
+                'sla_rule': '#FFD700',
                 'product': '#90EE90',
+                'lot': '#DA70D6',
+                'shipment': '#DDA0DD',
+                'cold_chain_reading': '#1E90FF',
                 'warehouse': '#FFA500',
+                'lane': '#20B2AA',
                 'customer': '#F08080',
-                'shipment': '#DDA0DD'
+                'cost': '#FFC0CB',
+                'event': '#DC143C'
             }
 
             for node_type, color in node_types_colors.items():
                 nodes_of_type = [n for n, d in simulator.current_graph.nodes(data=True)
                                if d.get('node_type') == node_type]
 
-                if nodes_of_type:
-                    x_coords = [positions[node][0] for node in nodes_of_type]
-                    y_coords = [positions[node][1] for node in nodes_of_type]
+                nodes_with_positions = [node for node in nodes_of_type if node in positions]
+
+                if nodes_with_positions:
+                    x_coords = [positions[node][0] for node in nodes_with_positions]
+                    y_coords = [positions[node][1] for node in nodes_with_positions]
 
                     fig_network.add_trace(go.Scatter(
                         x=x_coords,
@@ -839,7 +849,29 @@ def show_network_explorer_page(simulator, analytics):
                         mode='markers',
                         marker=dict(size=10, color=color),
                         name=node_type.title(),
-                        text=[simulator.current_graph.nodes[node].get('name', node) for node in nodes_of_type],
+                        text=[simulator.current_graph.nodes[node].get('name', node) for node in nodes_with_positions],
+                        hovertemplate='%{text}<extra></extra>'
+                    ))
+
+            # Plot any remaining node types not explicitly mapped
+            other_nodes = [
+                n for n in simulator.current_graph.nodes()
+                if simulator.current_graph.nodes[n].get('node_type') not in node_types_colors
+            ]
+
+            other_nodes_with_positions = [node for node in other_nodes if node in positions]
+
+            if other_nodes_with_positions:
+                x_coords = [positions[node][0] for node in other_nodes_with_positions]
+                y_coords = [positions[node][1] for node in other_nodes_with_positions]
+                if x_coords:
+                    fig_network.add_trace(go.Scatter(
+                        x=x_coords,
+                        y=y_coords,
+                        mode='markers',
+                        marker=dict(size=10, color='#808080'),
+                        name='Other',
+                        text=[simulator.current_graph.nodes[node].get('name', node) for node in other_nodes_with_positions],
                         hovertemplate='%{text}<extra></extra>'
                     ))
 

@@ -782,21 +782,44 @@ class SupplyChainGraphBuilder:
         """Create hierarchical layout based on supply chain flow."""
         pos = {}
 
-        # Define layers
-        suppliers = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'supplier']
-        products = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'product']
-        warehouses = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'warehouse']
-        customers = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'customer']
-        shipments = [n for n, d in self.graph.nodes(data=True) if d.get('node_type') == 'shipment']
+        # Define vertical ordering for each node type (higher value = higher level)
+        node_type_layers = {
+            'supplier': 5.0,
+            'sla_rule': 4.5,
+            'product': 4.0,
+            'lot': 3.5,
+            'shipment': 3.0,
+            'cold_chain_reading': 2.5,
+            'warehouse': 2.0,
+            'lane': 1.5,
+            'customer': 1.0,
+            'cost': 0.5,
+            'event': 0.0
+        }
 
-        # Position nodes in layers
-        layers = [suppliers, products, shipments, warehouses, customers]
-        y_positions = [4, 3, 2, 1, 0]
+        default_layer = -0.5
+        layer_nodes: Dict[float, List[str]] = {}
 
-        for layer, y in zip(layers, y_positions):
-            for i, node in enumerate(layer):
-                x = i - len(layer) / 2
-                pos[node] = (x, y)
+        for node, data in self.graph.nodes(data=True):
+            node_type = data.get('node_type', 'unknown')
+            layer = node_type_layers.get(node_type, default_layer)
+            layer_nodes.setdefault(layer, []).append(node)
+
+        # Position nodes in each layer centered around 0
+        for layer in sorted(layer_nodes.keys(), reverse=True):
+            nodes = layer_nodes[layer]
+            count = len(nodes)
+            if count == 0:
+                continue
+            offset = (count - 1) / 2
+            for index, node in enumerate(sorted(nodes)):
+                x = index - offset
+                pos[node] = (x, layer)
+
+        # Ensure every node has a position
+        for index, node in enumerate(self.graph.nodes()):
+            if node not in pos:
+                pos[node] = (index * 0.5, default_layer)
 
         return pos
 
