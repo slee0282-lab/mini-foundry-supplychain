@@ -1,6 +1,13 @@
 [server]
-headless = true
-port = 8501
+# Disable file watcher to avoid inotify limit issues
+runOnSave = false
+fileWatcherType = "none"
 
-[browser]
-gatherUsageStats = false
+[client]
+# Disable automatic script reruns
+toolbarMode = "viewer"
+
+[runner]
+# Disable magic commands and fast reruns
+magicEnabled = false
+fastReruns = false
