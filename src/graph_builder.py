@@ -24,6 +24,37 @@ class SupplyChainGraphBuilder:
         self.graph = None
         self.node_positions = None
 
+    def _extract_properties(self, entity: Any) -> Dict[str, Any]:
+        """Safely extract property dictionaries from Neo4j entities."""
+        if entity is None:
+            return {}
+
+        if isinstance(entity, dict):
+            return entity
+
+        # neo4j.graph.Node/Relationship support .items() returning key/value pairs
+        if hasattr(entity, 'items'):
+            try:
+                return dict(entity.items())
+            except Exception:
+                pass
+
+        # py2neo entities expose properties via _properties
+        if hasattr(entity, '_properties'):
+            try:
+                return dict(entity._properties)
+            except Exception:
+                pass
+
+        # Fallback: try to build from attribute access if keys are available
+        if hasattr(entity, 'keys'):
+            try:
+                return {key: getattr(entity, key) for key in entity.keys()}
+            except Exception:
+                pass
+
+        return {}
+
     def build_graph_from_neo4j(self) -> nx.DiGraph:
         """Build NetworkX graph from Neo4j data."""
         with Timer("Building NetworkX graph from Neo4j"):
@@ -597,7 +628,7 @@ class SupplyChainGraphBuilder:
             shipment_id = record.get('shipment_id')
             if not reading_id or not shipment_id:
                 continue
-            rel_props = dict(record.get('rel') or {})
+            rel_props = self._extract_properties(record.get('rel'))
             edge_data = {
                 'relationship': 'monitors',
                 'weight': 0.3
@@ -619,7 +650,7 @@ class SupplyChainGraphBuilder:
             lot_id = record.get('lot_id')
             if not reading_id or not lot_id:
                 continue
-            rel_props = dict(record.get('rel') or {})
+            rel_props = self._extract_properties(record.get('rel'))
             edge_data = {
                 'relationship': 'tracks',
                 'weight': 0.3
@@ -719,7 +750,7 @@ class SupplyChainGraphBuilder:
                 'weight': 0.4
             }
 
-            rel_props = dict(record.get('rel') or {})
+            rel_props = self._extract_properties(record.get('rel'))
             for key, value in rel_props.items():
                 if key in edge_attrs:
                     continue
