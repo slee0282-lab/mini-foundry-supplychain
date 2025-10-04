@@ -181,6 +181,224 @@ class SupplyChainGraphBuilder:
 
         logger.info(f"Added {len(result)} shipment nodes")
 
+    def _add_lot_nodes(self, graph: nx.DiGraph):
+        """Add lot/batch nodes introduced in the pilot data set."""
+        query = """
+        MATCH (l:Lot)
+        RETURN l.lot_id as id,
+               l.product_id as product_id,
+               l.manufacturing_date as manufacturing_date,
+               l.expiry_date as expiry_date,
+               l.quantity_units as quantity,
+               l.status as status,
+               l.storage_condition as storage_condition,
+               l.site_id as site_id,
+               l.batch_record_id as batch_record_id,
+               l.quality_status as quality_status,
+               l.hold_reason as hold_reason,
+               l.recall_status as recall_status
+        """
+
+        result = self.neo4j.execute_cypher(query)
+        for record in result:
+            graph.add_node(
+                record['id'],
+                node_type='lot',
+                product_id=record.get('product_id'),
+                manufacturing_date=str(record['manufacturing_date']) if record.get('manufacturing_date') else None,
+                expiry_date=str(record['expiry_date']) if record.get('expiry_date') else None,
+                quantity=record.get('quantity'),
+                status=record.get('status'),
+                storage_condition=record.get('storage_condition'),
+                site_id=record.get('site_id'),
+                batch_record_id=record.get('batch_record_id'),
+                quality_status=record.get('quality_status'),
+                hold_reason=record.get('hold_reason'),
+                recall_status=record.get('recall_status'),
+                size=350,
+                color='mediumorchid'
+            )
+
+        logger.info(f"Added {len(result)} lot nodes")
+
+    def _add_event_nodes(self, graph: nx.DiGraph):
+        """Add disruption event nodes."""
+        query = """
+        MATCH (e:Event)
+        RETURN e.event_id as id,
+               e.event_type as event_type,
+               e.scope_type as scope_type,
+               e.scope_id as scope_id,
+               e.impact_value as impact_value,
+               e.impact_unit as impact_unit,
+               e.start_date as start_date,
+               e.end_date as end_date,
+               e.severity as severity,
+               e.status as status,
+               e.description as description
+        """
+
+        result = self.neo4j.execute_cypher(query)
+        for record in result:
+            graph.add_node(
+                record['id'],
+                node_type='event',
+                event_type=record.get('event_type'),
+                scope_type=record.get('scope_type'),
+                scope_id=record.get('scope_id'),
+                impact_value=record.get('impact_value'),
+                impact_unit=record.get('impact_unit'),
+                start_date=str(record['start_date']) if record.get('start_date') else None,
+                end_date=str(record['end_date']) if record.get('end_date') else None,
+                severity=record.get('severity'),
+                status=record.get('status'),
+                description=record.get('description'),
+                size=280,
+                color='crimson'
+            )
+
+        logger.info(f"Added {len(result)} event nodes")
+
+    def _add_sla_rule_nodes(self, graph: nx.DiGraph):
+        """Add SLA rule nodes and metadata."""
+        query = """
+        MATCH (s:SLARule)
+        RETURN s.rule_id as id,
+               s.region as region,
+               s.product_category as product_category,
+               s.product_id as product_id,
+               s.promised_days as promised_days,
+               s.priority as priority,
+               s.customer_tier as customer_tier
+        """
+
+        result = self.neo4j.execute_cypher(query)
+        for record in result:
+            graph.add_node(
+                record['id'],
+                node_type='sla_rule',
+                region=record.get('region'),
+                product_category=record.get('product_category'),
+                product_id=record.get('product_id'),
+                promised_days=record.get('promised_days'),
+                priority=record.get('priority'),
+                customer_tier=record.get('customer_tier'),
+                size=260,
+                color='gold'
+            )
+
+        logger.info(f"Added {len(result)} SLA rule nodes")
+
+    def _add_lane_nodes(self, graph: nx.DiGraph):
+        """Add logistics lane nodes."""
+        query = """
+        MATCH (l:Lane)
+        RETURN l.lane_id as id,
+               l.origin_region as origin_region,
+               l.dest_region as dest_region,
+               l.base_lead_time_days as base_lead_time_days,
+               l.transport_mode as transport_mode,
+               l.distance_km as distance_km,
+               l.reliability_score as reliability_score,
+               l.capacity_units_per_week as capacity_units_per_week
+        """
+
+        result = self.neo4j.execute_cypher(query)
+        for record in result:
+            graph.add_node(
+                record['id'],
+                node_type='lane',
+                origin_region=record.get('origin_region'),
+                dest_region=record.get('dest_region'),
+                base_lead_time_days=record.get('base_lead_time_days'),
+                transport_mode=record.get('transport_mode'),
+                distance_km=record.get('distance_km'),
+                reliability_score=record.get('reliability_score'),
+                capacity_units_per_week=record.get('capacity_units_per_week'),
+                size=240,
+                color='darkseagreen'
+            )
+
+        logger.info(f"Added {len(result)} lane nodes")
+
+    def _add_cost_nodes(self, graph: nx.DiGraph):
+        """Add cost nodes representing financial data."""
+        query = """
+        MATCH (c:Cost)
+        RETURN c.cost_id as id,
+               c.cost_type as cost_type,
+               c.category as category,
+               c.product_id as product_id,
+               c.region as region,
+               c.customer_tier as customer_tier,
+               c.value as value,
+               c.currency as currency,
+               c.unit as unit,
+               c.notes as notes
+        """
+
+        result = self.neo4j.execute_cypher(query)
+        for record in result:
+            graph.add_node(
+                record['id'],
+                node_type='cost',
+                cost_type=record.get('cost_type'),
+                category=record.get('category'),
+                product_id=record.get('product_id'),
+                region=record.get('region'),
+                customer_tier=record.get('customer_tier'),
+                value=record.get('value'),
+                currency=record.get('currency'),
+                unit=record.get('unit'),
+                notes=record.get('notes'),
+                size=220,
+                color='lightpink'
+            )
+
+        logger.info(f"Added {len(result)} cost nodes")
+
+    def _add_cold_chain_reading_nodes(self, graph: nx.DiGraph):
+        """Add cold chain reading nodes for temperature monitoring."""
+        query = """
+        MATCH (r:ColdChainReading)
+        RETURN r.reading_id as id,
+               r.shipment_id as shipment_id,
+               r.lot_id as lot_id,
+               r.timestamp as timestamp,
+               r.temperature_c as temperature_c,
+               r.humidity_percent as humidity_percent,
+               r.location as location,
+               r.device_id as device_id,
+               r.threshold_min_c as threshold_min_c,
+               r.threshold_max_c as threshold_max_c,
+               r.excursion_flag as excursion_flag,
+               r.excursion_duration_minutes as excursion_duration_minutes,
+               r.notes as notes
+        """
+
+        result = self.neo4j.execute_cypher(query)
+        for record in result:
+            graph.add_node(
+                record['id'],
+                node_type='cold_chain_reading',
+                shipment_id=record.get('shipment_id'),
+                lot_id=record.get('lot_id'),
+                timestamp=str(record['timestamp']) if record.get('timestamp') else None,
+                temperature_c=record.get('temperature_c'),
+                humidity_percent=record.get('humidity_percent'),
+                location=record.get('location'),
+                device_id=record.get('device_id'),
+                threshold_min_c=record.get('threshold_min_c'),
+                threshold_max_c=record.get('threshold_max_c'),
+                excursion_flag=record.get('excursion_flag'),
+                excursion_duration_minutes=record.get('excursion_duration_minutes'),
+                notes=record.get('notes'),
+                size=200,
+                color='lightskyblue'
+            )
+
+        logger.info(f"Added {len(result)} cold chain reading nodes")
+
     def _add_supply_relationships(self, graph: nx.DiGraph):
         """Add supplier-product relationships."""
         query = """
@@ -310,6 +528,207 @@ class SupplyChainGraphBuilder:
 
         total_shipment_edges = len(result1) + len(result2) + len(result3)
         logger.info(f"Added {total_shipment_edges} shipment relationships")
+
+    def _add_lot_relationships(self, graph: nx.DiGraph):
+        """Add relationships for lot, SLA, cost, and monitoring data."""
+        total_relationships = 0
+
+        # Lot -> Product
+        query_belongs = """
+        MATCH (l:Lot)-[r:BELONGS_TO]->(p:Product)
+        RETURN l.lot_id as lot_id,
+               p.product_id as product_id
+        """
+
+        belongs = self.neo4j.execute_cypher(query_belongs)
+        for record in belongs:
+            if not record.get('lot_id') or not record.get('product_id'):
+                continue
+            graph.add_edge(
+                record['lot_id'],
+                record['product_id'],
+                relationship='belongs_to',
+                weight=0.4
+            )
+        total_relationships += len(belongs)
+
+        # Shipment -> Lot
+        query_contains = """
+        MATCH (s:Shipment)-[r:CONTAINS]->(l:Lot)
+        RETURN s.shipment_id as shipment_id,
+               l.lot_id as lot_id,
+               r.quantity_units as quantity_units,
+               r.packing_date as packing_date,
+               r.shipping_date as shipping_date,
+               r.temperature_monitored as temperature_monitored,
+               r.notes as notes
+        """
+
+        contains = self.neo4j.execute_cypher(query_contains)
+        for record in contains:
+            shipment_id = record.get('shipment_id')
+            lot_id = record.get('lot_id')
+            if not shipment_id or not lot_id:
+                continue
+            graph.add_edge(
+                shipment_id,
+                lot_id,
+                relationship='contains_lot',
+                quantity_units=record.get('quantity_units'),
+                packing_date=str(record['packing_date']) if record.get('packing_date') else None,
+                shipping_date=str(record['shipping_date']) if record.get('shipping_date') else None,
+                temperature_monitored=record.get('temperature_monitored'),
+                notes=record.get('notes'),
+                weight=0.5
+            )
+        total_relationships += len(contains)
+
+        # Cold chain monitoring relationships
+        query_monitors = """
+        MATCH (r:ColdChainReading)-[rel:MONITORS]->(s:Shipment)
+        RETURN r.reading_id as reading_id,
+               s.shipment_id as shipment_id,
+               rel
+        """
+
+        monitors = self.neo4j.execute_cypher(query_monitors)
+        for record in monitors:
+            reading_id = record.get('reading_id')
+            shipment_id = record.get('shipment_id')
+            if not reading_id or not shipment_id:
+                continue
+            rel_props = dict(record.get('rel') or {})
+            edge_data = {
+                'relationship': 'monitors',
+                'weight': 0.3
+            }
+            edge_data.update({k: (str(v) if hasattr(v, 'isoformat') else v) for k, v in rel_props.items()})
+            graph.add_edge(reading_id, shipment_id, **edge_data)
+        total_relationships += len(monitors)
+
+        query_tracks = """
+        MATCH (r:ColdChainReading)-[rel:TRACKS]->(l:Lot)
+        RETURN r.reading_id as reading_id,
+               l.lot_id as lot_id,
+               rel
+        """
+
+        tracks = self.neo4j.execute_cypher(query_tracks)
+        for record in tracks:
+            reading_id = record.get('reading_id')
+            lot_id = record.get('lot_id')
+            if not reading_id or not lot_id:
+                continue
+            rel_props = dict(record.get('rel') or {})
+            edge_data = {
+                'relationship': 'tracks',
+                'weight': 0.3
+            }
+            edge_data.update({k: (str(v) if hasattr(v, 'isoformat') else v) for k, v in rel_props.items()})
+            graph.add_edge(reading_id, lot_id, **edge_data)
+        total_relationships += len(tracks)
+
+        # SLA rules linked to products
+        query_sla = """
+        MATCH (s:SLARule)-[r:APPLIES_TO]->(p:Product)
+        RETURN s.rule_id as rule_id,
+               p.product_id as product_id
+        """
+
+        sla_edges = self.neo4j.execute_cypher(query_sla)
+        for record in sla_edges:
+            rule_id = record.get('rule_id')
+            product_id = record.get('product_id')
+            if not rule_id or not product_id:
+                continue
+            graph.add_edge(
+                rule_id,
+                product_id,
+                relationship='applies_to',
+                weight=0.2
+            )
+        total_relationships += len(sla_edges)
+
+        # Cost records linked to products
+        query_cost = """
+        MATCH (c:Cost)-[r:APPLIES_TO]->(p:Product)
+        RETURN c.cost_id as cost_id,
+               p.product_id as product_id
+        """
+
+        cost_edges = self.neo4j.execute_cypher(query_cost)
+        for record in cost_edges:
+            cost_id = record.get('cost_id')
+            product_id = record.get('product_id')
+            if not cost_id or not product_id:
+                continue
+            graph.add_edge(
+                cost_id,
+                product_id,
+                relationship='applies_to',
+                weight=0.2
+            )
+        total_relationships += len(cost_edges)
+
+        logger.info(f"Added {total_relationships} Phase 1 relationships")
+
+    def _add_event_relationships(self, graph: nx.DiGraph):
+        """Add event impact relationships."""
+        query = """
+        MATCH (e:Event)-[r:IMPACTS]->(target)
+        RETURN e.event_id as event_id,
+               e.event_type as event_type,
+               e.severity as severity,
+               e.status as status,
+               e.start_date as start_date,
+               e.end_date as end_date,
+               e.description as description,
+               r as rel,
+               labels(target) as target_labels,
+               coalesce(
+                   target.supplier_id,
+                   target.product_id,
+                   target.warehouse_id,
+                   target.customer_id,
+                   target.shipment_id,
+                   target.lot_id,
+                   target.rule_id,
+                   target.cost_id,
+                   target.lane_id,
+                   target.reading_id
+               ) as target_id
+        """
+
+        results = self.neo4j.execute_cypher(query)
+        added = 0
+        for record in results:
+            event_id = record.get('event_id')
+            target_id = record.get('target_id')
+            if not event_id or not target_id:
+                continue
+
+            edge_attrs = {
+                'relationship': 'impacts',
+                'event_type': record.get('event_type'),
+                'severity': record.get('severity'),
+                'status': record.get('status'),
+                'start_date': str(record['start_date']) if record.get('start_date') else None,
+                'end_date': str(record['end_date']) if record.get('end_date') else None,
+                'description': record.get('description'),
+                'target_labels': record.get('target_labels'),
+                'weight': 0.4
+            }
+
+            rel_props = dict(record.get('rel') or {})
+            for key, value in rel_props.items():
+                if key in edge_attrs:
+                    continue
+                edge_attrs[key] = str(value) if hasattr(value, 'isoformat') else value
+
+            graph.add_edge(event_id, target_id, **edge_attrs)
+            added += 1
+
+        logger.info(f"Added {added} event relationships")
 
     def calculate_node_positions(self, layout: str = 'spring') -> Dict[str, Tuple[float, float]]:
         """Calculate node positions for visualization."""
