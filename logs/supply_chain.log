@@ -1044,3 +1044,71 @@ Next steps:
 2025-10-08 18:36:44,225 - root - INFO - Starting: Calculating supplier risk analysis
 2025-10-08 18:36:44,226 - root - INFO - Completed: Calculating supplier risk analysis in 0.00 seconds
 2025-10-08 18:36:44,226 - root - INFO - Completed: Calculating dashboard metrics in 0.00 seconds
+2025-10-09 14:35:39,429 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:35:39,489 - data_loader - INFO - Neo4j connection config: URI=neo4j+s://6ec12f7c.databases.neo4j.io, USER=neo4j
+2025-10-09 14:35:39,489 - data_loader - INFO - Using Neo4j driver only (Aura mode)
+2025-10-09 14:35:40,716 - data_loader - INFO - Successfully connected to Neo4j at neo4j+s://6ec12f7c.databases.neo4j.io
+2025-10-09 14:35:40,721 - simulator - INFO - Simulator data path resolved to /Users/seungholee/Workspace/mini-foundry-supplychain/data
+2025-10-09 14:35:40,722 - simulator - INFO - Simulator pilot data path resolved to /Users/seungholee/Workspace/mini-foundry-supplychain/data/pilot_missing_supporting_files
+2025-10-09 14:35:40,722 - root - INFO - Starting: Initializing simulation graph
+2025-10-09 14:35:40,722 - root - INFO - Starting: Building NetworkX graph from Neo4j
+2025-10-09 14:35:40,863 - graph_builder - INFO - Added 5 supplier nodes
+2025-10-09 14:35:40,998 - graph_builder - INFO - Added 5 product nodes
+2025-10-09 14:35:41,128 - graph_builder - INFO - Added 5 warehouse nodes
+2025-10-09 14:35:41,257 - graph_builder - INFO - Added 5 customer nodes
+2025-10-09 14:35:41,387 - graph_builder - INFO - Added 8 shipment nodes
+2025-10-09 14:35:41,533 - graph_builder - INFO - Added 50 lot nodes
+2025-10-09 14:35:41,663 - graph_builder - INFO - Added 44 event nodes
+2025-10-09 14:35:41,799 - graph_builder - INFO - Added 40 SLA rule nodes
+2025-10-09 14:35:41,937 - graph_builder - INFO - Added 45 lane nodes
+2025-10-09 14:35:42,081 - graph_builder - INFO - Added 62 cost nodes
+2025-10-09 14:35:42,233 - graph_builder - INFO - Added 64 cold chain reading nodes
+2025-10-09 14:35:42,388 - graph_builder - INFO - Added 8 supply relationships
+2025-10-09 14:35:42,525 - graph_builder - INFO - Added 8 stocking relationships
+2025-10-09 14:35:42,650 - graph_builder - INFO - Added 5 delivery relationships
+2025-10-09 14:35:43,067 - graph_builder - INFO - Added 24 shipment relationships
+2025-10-09 14:35:43,883 - graph_builder - INFO - Added 273 Phase 1 relationships
+2025-10-09 14:35:44,058 - graph_builder - INFO - Added 44 event relationships
+2025-10-09 14:35:44,059 - graph_builder - INFO - Graph built: 333 nodes, 360 edges
+2025-10-09 14:35:44,059 - root - INFO - Completed: Building NetworkX graph from Neo4j in 3.34 seconds
+2025-10-09 14:35:44,061 - simulator - INFO - Simulation engine initialized with supply chain graph
+2025-10-09 14:35:44,061 - root - INFO - Completed: Initializing simulation graph in 3.34 seconds
+2025-10-09 14:35:45,281 - simulator - INFO - Cold chain data loaded: 64 readings
+2025-10-09 14:35:45,288 - simulator - INFO - Baseline data loaded for simulation analytics
+2025-10-09 14:35:45,288 - root - INFO - Starting: Initializing supply chain analytics
+2025-10-09 14:35:45,288 - root - INFO - Starting: Building NetworkX graph from Neo4j
+2025-10-09 14:35:45,423 - graph_builder - INFO - Added 5 supplier nodes
+2025-10-09 14:35:45,551 - graph_builder - INFO - Added 5 product nodes
+2025-10-09 14:35:45,681 - graph_builder - INFO - Added 5 warehouse nodes
+2025-10-09 14:35:45,811 - graph_builder - INFO - Added 5 customer nodes
+2025-10-09 14:35:45,934 - graph_builder - INFO - Added 8 shipment nodes
+2025-10-09 14:35:46,058 - graph_builder - INFO - Added 50 lot nodes
+2025-10-09 14:35:46,188 - graph_builder - INFO - Added 44 event nodes
+2025-10-09 14:35:46,324 - graph_builder - INFO - Added 40 SLA rule nodes
+2025-10-09 14:35:46,459 - graph_builder - INFO - Added 45 lane nodes
+2025-10-09 14:35:46,604 - graph_builder - INFO - Added 62 cost nodes
+2025-10-09 14:35:46,752 - graph_builder - INFO - Added 64 cold chain reading nodes
+2025-10-09 14:35:46,887 - graph_builder - INFO - Added 8 supply relationships
+2025-10-09 14:35:47,028 - graph_builder - INFO - Added 8 stocking relationships
+2025-10-09 14:35:47,152 - graph_builder - INFO - Added 5 delivery relationships
+2025-10-09 14:35:47,554 - graph_builder - INFO - Added 24 shipment relationships
+2025-10-09 14:35:48,385 - graph_builder - INFO - Added 273 Phase 1 relationships
+2025-10-09 14:35:48,542 - graph_builder - INFO - Added 44 event relationships
+2025-10-09 14:35:48,543 - graph_builder - INFO - Graph built: 333 nodes, 360 edges
+2025-10-09 14:35:48,543 - root - INFO - Completed: Building NetworkX graph from Neo4j in 3.25 seconds
+2025-10-09 14:35:48,544 - analytics - INFO - Analytics engine initialized
+2025-10-09 14:35:48,544 - root - INFO - Completed: Initializing supply chain analytics in 3.26 seconds
+2025-10-09 14:35:48,548 - root - INFO - Starting: Calculating dashboard metrics
+2025-10-09 14:35:48,549 - root - INFO - Starting: Calculating supplier risk analysis
+2025-10-09 14:35:48,551 - root - INFO - Completed: Calculating supplier risk analysis in 0.00 seconds
+2025-10-09 14:35:48,552 - root - INFO - Completed: Calculating dashboard metrics in 0.00 seconds
+2025-10-09 14:35:51,421 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:35:54,129 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:35:56,071 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:35:56,808 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:36:04,280 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:36:05,119 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:36:05,127 - simulator - ERROR - Cold chain excursion simulation failed: No excursions detected for the selected shipment(s).
+2025-10-09 14:36:11,806 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:36:12,573 - utils - INFO - Logging configured - Level: INFO, File: logs/supply_chain.log
+2025-10-09 14:36:12,582 - simulator - ERROR - Cold chain excursion simulation failed: No excursions detected for the selected shipment(s).

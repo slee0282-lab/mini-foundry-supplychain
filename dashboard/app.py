@@ -56,13 +56,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-@st.cache_resource
-def initialize_applications():
-    """Initialize all application components with caching."""
+@st.cache_resource(ttl=60)  # Cache for 60 seconds, then refresh
+def initialize_applications(_force_refresh=False):
+    """Initialize all application components with caching.
+
+    Args:
+        _force_refresh: Internal parameter to force cache refresh (prefix with _ to exclude from hash)
+    """
     try:
         neo4j_conn = Neo4jConnection()
         simulator = SupplyChainSimulator(neo4j_conn)
         analytics = SupplyChainAnalytics(neo4j_conn)
+        logger.info(f"Applications initialized - Cold chain data: {len(simulator.cold_chain_df)} rows")
         return simulator, analytics, neo4j_conn
     except Exception as e:
         st.error(f"Failed to initialize applications: {str(e)}")
@@ -412,6 +417,11 @@ def show_simulation_page(simulator):
 
     st.sidebar.header("🎛️ Scenario Controls")
 
+    # Add refresh button for data reload
+    if st.sidebar.button("🔄 Refresh Data", help="Reload data from Neo4j"):
+        st.cache_resource.clear()
+        st.rerun()
+
     scenario_options = {
         "Supplier Delay": "supplier_delay",
         "Supplier Outage": "supplier_outage",
@@ -478,7 +488,11 @@ def show_simulation_page(simulator):
     elif scenario_type == "cold_chain_hold":
         if simulator.cold_chain_df.empty:
             st.error("Cold chain data not available.")
+            st.info("💡 Tip: Click 'Refresh Data' button above to reload data from Neo4j")
             return
+
+        # Show data status
+        st.sidebar.info(f"✅ {len(simulator.cold_chain_df)} cold chain readings loaded")
 
         shipments_with_readings = sorted(simulator.cold_chain_df['shipment_id'].dropna().unique())
         focus_option = st.sidebar.selectbox("Focus Shipment (optional)", ["-- All excursions --"] + shipments_with_readings)

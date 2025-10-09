@@ -31,7 +31,8 @@
       "Bash(python:*)",
       "Bash(python3:*)",
       "Bash(awk:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": [],
     "ask": []
