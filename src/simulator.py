@@ -411,8 +411,9 @@ class SupplyChainSimulator:
     def _load_shipment_schedule(self) -> pd.DataFrame:
         """Load shipment packing/shipping schedule information."""
         query = """
-        MATCH (sh:Shipment)-[r:CONTAINS]->(:Lot)
+        MATCH (sh:Shipment)-[r:CONTAINS]->(l:Lot)
         RETURN sh.shipment_id as shipment_id,
+               l.lot_id as lot_id,
                r.packing_date as packing_date,
                r.shipping_date as shipping_date
         """
