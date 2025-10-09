@@ -541,6 +541,7 @@ class SupplyChainSimulator:
             if readings_file.exists():
                 try:
                     cold_chain_df = pd.read_csv(readings_file)
+                    logger.info(f"Loaded {len(cold_chain_df)} cold chain readings from CSV {readings_file}")
                 except Exception as e:
                     logger.error(f"Failed to read cold chain CSV: {str(e)}")
                     cold_chain_df = pd.DataFrame()
@@ -550,6 +551,7 @@ class SupplyChainSimulator:
         if not cold_chain_df.empty and 'timestamp' in cold_chain_df.columns:
             cold_chain_df['timestamp'] = pd.to_datetime(cold_chain_df['timestamp'], errors='coerce')
 
+        logger.info(f"Cold chain data loaded: {len(cold_chain_df)} readings")
         return cold_chain_df
 
     def _get_promised_days(self, region: str, product_id: str) -> int:
